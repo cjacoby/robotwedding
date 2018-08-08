@@ -7,6 +7,7 @@ name = "pypi"
 "luma.oled" = "*"
 "smbus2" = "*"
 "luma.lcd" = "*"
+"luma.core" = "*"
 
 [dev-packages]
 
