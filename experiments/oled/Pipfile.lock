@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7b1991c9c9a8f40655f0113a906e04c5500deb09fa40927e72336e9c99857420"
+            "sha256": "be374abe0e8edbacce2bff298129af61dec3f6c8cf7af97e8b0c9f1f9163392e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -22,6 +22,14 @@
                 "sha256:b5028b1471b7a5a2df11aeccf7b3506cfff63710826259c5ad0dc5a1e9395866"
             ],
             "version": "==1.7.2"
+        },
+        "luma.lcd": {
+            "hashes": [
+                "sha256:04a95ef5992c697e6c7c22de270e62bb1c79bafed43733366468dff9b155d77a",
+                "sha256:5306f69bfcc2556b793ce42d5143f00c106704acefb06287c54dc7a10c6b781d"
+            ],
+            "index": "pypi",
+            "version": "==1.0.3"
         },
         "luma.oled": {
             "hashes": [

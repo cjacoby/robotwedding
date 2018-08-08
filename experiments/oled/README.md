@@ -8,3 +8,6 @@ Brynand was here!
 
 ## Run with SSD1351 OLED
 ```pipenv run ./text.py --config=oled.config```
+
+## Run with ST7735 LCD
+```pipenv run ./text.py --config=lcd.config```
