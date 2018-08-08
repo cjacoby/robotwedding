@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+
+[packages]
+pillow = "*"
+picamera = "*"
+numpy = "*"
+click = "*"
+tensorflow = "*"
+
+[requires]
+python_version = "3.6"
