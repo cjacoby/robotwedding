@@ -6,11 +6,9 @@ name = "pypi"
 [dev-packages]
 
 [packages]
-pillow = "*"
+tensorflow = "==1.9.0"
 picamera = "*"
-numpy = "*"
-click = "*"
-tensorflow = "*"
+pillow = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.5"
