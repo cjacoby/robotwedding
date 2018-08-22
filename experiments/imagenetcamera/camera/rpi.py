@@ -1,4 +1,3 @@
-import click
 import io
 import numpy as np
 import picamera
@@ -40,14 +39,16 @@ def capture_resized_array(newsize=(224, 224)):
         camera.resolution = (1024, 768)
         with picamera.array.PiRGBArray(camera, size=newsize) as output:
             camera.capture(output, 'rgb', resize=newsize)
-            print('Captured {}x{} image'.format(output.array.shape[1], output.array.shape[0]))
-            import pdb; pdb.set_trace()
+            print('Captured {}x{} image'.format(
+                output.array.shape[1], output.array.shape[0]))
             print("Shape:", output.array.shape)
             return output.array
 
 
 if __name__ == "__main__":
-    capture_image("testimg.jpeg")
-
+    print("Running rpi camera test")
+    print("Array capture...")
     capture_resized_array()
-    
+
+    print("Writing to testimg.jpg")
+    capture_image("testimg.jpg")
