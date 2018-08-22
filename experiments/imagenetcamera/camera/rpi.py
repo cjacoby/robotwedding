@@ -48,12 +48,15 @@ def capture_resized_array(newsize=(224, 224)):
 def generate_capture(newsize=(224, 224)):
     with picamera.PiCamera() as camera:
         camera.resolution = (1024, 768)
+#        camera.resolution = (640, 480)
         with picamera.array.PiRGBArray(camera, size=newsize) as output:
-            for _ in camera.capture_continuous(output, 'rgb', resize=newsize):
+            for frame in camera.capture_continuous(output, 'rgb', resize=newsize):
                 # camera.capture(output, 'rgb', resize=newsize)
                 yield output.array
 
+                output.truncate(0)
 
+                
 if __name__ == "__main__":
     print("Running rpi camera test")
     print("Array capture...")
@@ -64,6 +67,7 @@ if __name__ == "__main__":
     for i in range(3):
         gen_img = next(capture_gen)
         print(gen_img.shape)
+    capture_gen.close()
 
     print("Writing to testimg.jpg")
     capture_image("testimg.jpg")
