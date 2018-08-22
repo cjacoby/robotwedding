@@ -48,10 +48,10 @@ def capture_resized_array(newsize=(224, 224)):
 def generate_capture(newsize=(224, 224)):
     with picamera.PiCamera() as camera:
         camera.resolution = (1024, 768)
-        while True:
-            with picamera.array.PiRGBArray(camera, size=newsize) as output:
-                    camera.capture(output, 'rgb', resize=newsize)
-                    yield output.array
+        with picamera.array.PiRGBArray(camera, size=newsize) as output:
+            for _ in camera.capture_continuous(output, 'rgb', resize=newsize):
+                # camera.capture(output, 'rgb', resize=newsize)
+                yield output.array
 
 
 if __name__ == "__main__":
