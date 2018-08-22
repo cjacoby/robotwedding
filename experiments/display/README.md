@@ -10,25 +10,29 @@ Brynand was here!
 ```pipenv run ./text.py --config=oled.config```
 
 ### Pins
-* Display -> RPi
-* SI (MOSI) -> MOSI
-* CL (SCK) -> SCLK
-* DC (DC) -> #24
-* R (RESET) -> #25
-* OC (OLEDCS) -> CE0
-* + (Vin) -> 5.0V
-* G (GND) -> GND
+
+| Display (top) | Display (bottom) | Raspberry Pi | 
+|---------------|------------------|--------------| 
+| SI            | MOSI             | MOSI         | 
+| CL            | SCK              | SCLK         | 
+| DC            | DC               | #24          | 
+| R             | RESET            | #25          | 
+| OC            | OLEDCS           | CE0          | 
+| +             | Vin              | 5.0V         | 
+| G             | GND              | GND          | 
+
 
 ## Run with ST7735 LCD
 ```pipenv run ./text.py --config=lcd.config```
 
 ### Pins
-* Display -> RPi
-* Vin (Vin) -> 3V3
-* Gnd (GND) -> GND
-* SCK (SCK) -> SCLK
-* SI (MOSI) -> MOSI
-* TCS (TFT_CS) -> CE0
-* RST (RESET) -> #24
-* D/C (D/C) -> #23
-* Lite (LITE) -> #18
+| Display (top) | Display (bottom) | Raspberry Pi | 
+|---------------|------------------|--------------| 
+| Vin           | Vin              | 3V3          | 
+| Gnd           | GND              | GND          | 
+| SCK           | SCK              | SCLK         | 
+| SI            | MOSI             | MOSI         | 
+| TCS           | TFT_CS           | CE0          | 
+| RST           | RESET            | #24          | 
+| D/C           | D/C              | #23          | 
+| Lite          | LITE             | #18          | 
