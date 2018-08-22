@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Runs a main loop."""
 
 import classify
@@ -20,7 +21,7 @@ def main():
     except KeyboardInterrupt:
         print("Exiting")
         img_gen.close()
-            
+
 
 if __name__ == "__main__":
     main()

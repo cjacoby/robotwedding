@@ -4,11 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
+ipython = "*"
 
 [packages]
 tensorflow = "==1.9.0"
 picamera = "*"
 pillow = "*"
+"h5py" = "*"
 
 [requires]
 python_version = "3.5"
