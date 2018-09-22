@@ -16,7 +16,8 @@ class LEDPushButton(object):
         GPIO.setup(self.led_pin, GPIO.OUT)
         GPIO.setup(self.switch_pin, GPIO.IN, pull_up_down=self.pud)
 
-        GPIO.add_event_detect(self.switch_pin, GPIO.RISING, callback=button_callback, bouncetime=200)
+        GPIO.add_event_detect(self.switch_pin, GPIO.RISING,
+                              callback=button_callback, bouncetime=200)
 
     def toggle_led(self):
         print("toggle", self.led_pin)

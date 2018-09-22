@@ -1,0 +1,13 @@
+buttons:
+  - type: led_push_button
+    switch_pin: 18
+    led_pin: 4
+  - type: led_push_button
+    switch_pin: 27
+    led_pin: 17
+  - type: led_push_button
+    switch_pin: 23
+    led_pin: 22
+  - type: led_push_button
+    switch_pin: 25
+    led_pin: 24
