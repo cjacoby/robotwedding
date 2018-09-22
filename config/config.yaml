@@ -17,5 +17,6 @@ servos:
   - servo_channel: 1
   - servo_channel: 4
   - servo_channel: 5
+    servo_range: [0, 4096]
   - servo_channel: 8
   - servo_channel: 9

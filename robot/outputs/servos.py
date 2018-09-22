@@ -49,7 +49,8 @@ class Servo(object):
     def set_position_stepped(self, dest_value: float,
                              time_to_move: float, steps: int = 10,
                              scale_fn=np.linspace):
-        scaled_value = np.clip(scale(dest_value, self.servo_range), 0.0, 1.0)
+        dest_value = np.clip(dest_value, 0.0, 1.0)
+        scaled_value = scale(dest_value, self.servo_range)
         value_steps = scale_fn(self.last_value, scaled_value, num=steps)
 
         for v in value_steps:
