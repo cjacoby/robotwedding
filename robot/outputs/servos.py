@@ -11,6 +11,7 @@ FS5103R Ranges:
 
 
 """
+import enum
 import numpy as np
 import logging
 import time
@@ -28,21 +29,6 @@ def scale(value, range_):
     range : tuple (min, max)
     """
     return (value * (range_[1] - range_[0]) + range_[0])
-
-
-@enum.unique
-class ServoType(str, enum.Enum):
-    BASIC = ('servo', Servo)
-    CONTINUOUS = ('continuous', ContinuousServo)
-
-    def __new__(cls, value, servo_cls):
-        obj = str.__new__(cls)
-        obj._value_ = value
-        obj.servo_cls = servo_cls
-        return obj
-
-    def __str__(self):
-        return self.value
 
 
 class Servo(object):
@@ -89,7 +75,7 @@ class ContinuousServo(Servo):
     def __init__(self, servo_channel: int,
                  bw_servo_range: tuple = (4, 375),
                  fw_servo_range: tuple = (380, 2048),
-                 stop_value: int: 0):
+                 stop_value: int = 0):
         self.channel = servo_channel
         self.bw_range = bw_servo_range
         self.fw_range = fw_servo_range
@@ -104,6 +90,21 @@ class ContinuousServo(Servo):
 
         elif value < 0:
             self.set_position(scale(dest_value, self.bw_range))
+
+
+@enum.unique
+class ServoType(str, enum.Enum):
+    BASIC = ('servo', Servo)
+    CONTINUOUS = ('continuous', ContinuousServo)
+
+    def __new__(cls, value, servo_cls):
+        obj = str.__new__(cls)
+        obj._value_ = value
+        obj.servo_cls = servo_cls
+        return obj
+
+    def __str__(self):
+        return self.value
 
 
 def servo_factory(servo_defs: list):
