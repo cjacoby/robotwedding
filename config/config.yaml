@@ -13,10 +13,15 @@ buttons:
     led_pin: 24
 
 servos:
-  - servo_channel: 0
-  - servo_channel: 1
-  - servo_channel: 4
-  - servo_channel: 5
-    servo_range: [0, 4096]
-  - servo_channel: 8
-  - servo_channel: 9
+  - type: servo
+    servo_channel: 0
+  - type: servo
+    servo_channel: 1
+  - type: servo
+    servo_channel: 4
+  - type: continuous
+    servo_channel: 5
+  - type: servo
+    servo_channel: 8
+  - type: servo
+    servo_channel: 9
