@@ -84,6 +84,7 @@ class ContinuousServo(Servo):
 
     def set_position(self, value: int):
         """Set the voltage value of the pwm."""
+        value = int(value)
         print(f"Servo {self} position: {value}")
         self.pwm.set_pwm(self.channel, 0, value)
         self.last_value = value
