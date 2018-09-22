@@ -36,17 +36,20 @@ class Servo(object):
 
     def set_position(self, value: int):
         """Set the voltage value of the pwm."""
-        self.pwm.set_pwm(self.channel, np.clip(value, *SERVO_RANGE))
+        position_val = int(np.clip(value, *self.servo_range))
+        print(f"Servo {self} position: {position_val}")
+        self.pwm.set_pwm(self.channel, 0, position_val)
         self.last_value = value
 
     def set_position_norm(self, value: float):
-        scaled_value = np.clip(scale(value, self.SERVO_RANGE), 0.0, 1.0)
+        value = np.clip(value, 0.0, 1.0)
+        scaled_value = scale(value, self.servo_range)
         self.set_position(scaled_value)
 
     def set_position_stepped(self, dest_value: float,
                              time_to_move: float, steps: int = 10,
                              scale_fn=np.linspace):
-        scaled_value = np.clip(scale(dest_value, self.SERVO_RANGE), 0.0, 1.0)
+        scaled_value = np.clip(scale(dest_value, self.servo_range), 0.0, 1.0)
         value_steps = scale_fn(self.last_value, scaled_value, num=steps)
 
         for v in value_steps:
