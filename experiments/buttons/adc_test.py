@@ -6,7 +6,7 @@ import RPi.GPIO as GPIO    # To use GPIO pins
 
 # Start SPI connection
 spi = spidev.SpiDev() # Created an object
-spi.open(0,0)
+spi.open(0,1)
 
 # Initializing LED pin as OUTPUT pin
 #led_pin = 20
