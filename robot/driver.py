@@ -71,11 +71,11 @@ class RobotDriver:
             self.servos[index].set_position_norm(position)
 
     def set_servo_stepped(self, index: int, position: float,
-                          duration: float):
+                          duration: float, steps: int):
         logger.info(f"Set Servo {index}: {position} over {duration}s")
         if 0 <= index < len(self.servos):
             self.servos[index].set_position_stepped(
-                position, duration)
+                position, duration, steps)
 
     def setup(self):
         for b in self.buttons:

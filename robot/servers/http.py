@@ -55,8 +55,9 @@ class Servos(Resource):
             duration = float(duration) if duration else None
 
             if duration:
+                steps = request_data.get('steps', 10)
                 robot_driver.set_servo_stepped(
-                    servo_id, position, duration)
+                    servo_id, position, duration, steps)
             else:
                 robot_driver.set_servo_position(
                     servo_id, position)
