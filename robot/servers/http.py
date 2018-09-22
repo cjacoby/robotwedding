@@ -47,6 +47,7 @@ class Knobs(Resource):
 
 class Servos(Resource):
     def post(self, servo_id):
+        servo_id = int(servo_id)
         try:
             request_data = json.loads(request.data)
             position = float(request_data['position'])
