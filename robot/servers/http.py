@@ -54,9 +54,11 @@ class Servos(Resource):
             duration = float(duration) if duration else None
 
             if duration:
-                robot_driver.set_servo_stepped(position, duration)
+                robot_driver.set_servo_stepped(
+                    servo_id, position, duration)
             else:
-                robot_driver.set_servo_position(position)
+                robot_driver.set_servo_position(
+                    servo_id, position)
         except KeyError:
             return {"message": "Invalid"}
 

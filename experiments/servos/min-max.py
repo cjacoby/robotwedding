@@ -11,7 +11,6 @@ import time
 
 import Adafruit_PCA9685
 
-import logging
 logging.basicConfig(level=logging.DEBUG)
 
 
