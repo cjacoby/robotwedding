@@ -43,11 +43,11 @@ class RobotDriver:
         return len(self.leds)
 
     def get_led_state(self, index):
-        return self.leds[index]
+        return self.leds[index].get_state()
 
     def toggle_led_state(self, index):
-        self.leds[index] = not self.leds[index]
-        return self.leds[index]
+        self.leds[index].toggle_led()
+        return self.leds[index].get_state()
 
     def get_knob_state(self, index):
         return self.knobs_state[index]

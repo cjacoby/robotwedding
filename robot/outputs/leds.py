@@ -24,3 +24,6 @@ class LED(object):
         self.led_state = not self.led_state
         GPIO.output(self.led_pin, GPIO.HIGH if self.led_state else GPIO.LOW)
         logger.debug("LED State (pin", self.led_pin, ") :", self.led_state)
+
+    def get_state(self):
+        return self.led_state
