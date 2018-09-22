@@ -94,10 +94,10 @@ class ContinuousServo(Servo):
             self.set_position(0)
 
         elif value > 0:
-            self.set_position(scale(dest_value, self.fw_range))
+            self.set_position(scale(value, self.fw_range))
 
         elif value < 0:
-            self.set_position(scale(dest_value, self.bw_range))
+            self.set_position(scale(value, self.bw_range))
 
         self.last_float = value
 
