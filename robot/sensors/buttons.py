@@ -2,6 +2,8 @@ try:
     import RPi.GPIO as GPIO
 except ImportError:
     import robot.dummyGPIO as GPIO
+
+import enum
 import logging
 
 from robot.outputs.leds import LED
@@ -46,20 +48,26 @@ class ADCButton(Button):
         self.adc_pin = adc_pin
 
 
+@enum.unique
+class ButtonType(str, enum.Enum):
+    GPIO = ('gpio_button', GPIOButton)
+    LEDPUSH = ('led_push_button', LEDPushButton)
+    ADCBUTTON = ('adc_button', ADCButton)
+
+    def __new__(cls, value, button_cls):
+        obj = str.__new__(cls)
+        obj._value_ = value
+        obj.button_cls = button_cls
+        return obj
+
+    def __str__(self):
+        return self.value
+
+
 def button_factory(button_def):
     """Create a single button from a button definition."""
     button_type = button_def.pop('type')
-
-    if button_type in ['GPIOButton', 'gpio_button']:
-        cls = GPIOButton
-
-    elif button_type in ['LEDPushButton', 'led_push_button']:
-        cls = LEDPushButton
-
-    elif button_type in ['ADCButton', 'adc_button']:
-        cls = ADCButton
-
-    return cls(**button_def)
+    return ButtonType(button_type).button_cls(**button_def)
 
 
 def multi_button_factory(button_defs):

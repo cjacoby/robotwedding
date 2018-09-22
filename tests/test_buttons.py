@@ -37,3 +37,14 @@ def test_multi_button_factory():
     assert isinstance(result[0], buttons.GPIOButton)
     assert isinstance(result[1], buttons.LEDPushButton)
     assert isinstance(result[2], buttons.ADCButton)
+
+
+@pytest.mark.parametrize('button_type,expected', [
+    ("gpio_button", buttons.GPIOButton),
+    ("led_push_button", buttons.LEDPushButton),
+    ("adc_button", buttons.ADCButton),
+])
+def test_buttontype_enum(button_type, expected):
+    b = buttons.ButtonType(button_type)
+    assert b.button_cls == expected
+    assert button_type == str(b)
