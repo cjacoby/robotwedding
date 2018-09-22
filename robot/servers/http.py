@@ -45,13 +45,30 @@ class Knobs(Resource):
         return {"knob_id": knob_id, "state": state}
 
 
+class Servos(Resource):
+    def post(self, servo_id):
+        try:
+            request_data = json.loads(request.data)
+            position = float(request_data['position'])
+            duration = request_data.get('duration')
+            duration = float(duration) if duration else None
+
+            if duration:
+                robot_driver.set_servo_stepped(position, duration)
+            else:
+                robot_driver.set_servo_position(position)
+        except KeyError:
+            return {"message": "Invalid"}
+
+
 api.add_resource(LEDs, "/leds/<led_id>")
 api.add_resource(Buttons, "/buttons/<button_id>")
 api.add_resource(Knobs, "/knobs/<knob_id>")
+api.add_resource(Servos, "/servos/<servo_id>")
 
 
 def run_server(driver):
     global robot_driver
 
     robot_driver = driver
-    app.run(port=5432, debug=True)
+    app.run(host="0.0.0.0", port=5432, debug=True)

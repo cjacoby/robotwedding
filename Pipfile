@@ -14,6 +14,7 @@ flask = "*"
 flask-restful = "*"
 "e1839a8" = {path = ".", editable = true}
 pytest = "*"
+"adafruit-pca9685" = "*"
 
 
 [dev-packages]

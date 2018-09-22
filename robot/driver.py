@@ -11,6 +11,7 @@ except ImportError:
     import robot.dummyGPIO as GPIO
 
 import robot.sensors.buttons as buttons
+import robot.outputs.servos as servos
 import robot.servers.osc as osc_serve
 import robot.servers.http as http_serve
 
@@ -30,11 +31,12 @@ class RobotDriver:
 
     def __init__(self, config):
         self.buttons = buttons.multi_button_factory(
-            config['buttons'])
+            config.get('buttons', []))
         self.leds = [x.led for x in self.buttons
                      if isinstance(x, buttons.LEDPushButton)]
         # self.leds = [False for i in range(self.N_LEDS)]
         # self.knobs_state = [0 for i in range(self.N_KNOBS)]
+        self.servos = servos.servo_factory(config.get('servos', []))
 
     def __repr__(self):
         return f"{self.__class__.__name__}()"
@@ -49,6 +51,10 @@ class RobotDriver:
         self.leds[index].toggle_led()
         return self.leds[index].get_state()
 
+    def toggle_all_leds(self):
+        for b in self.leds:
+            b.toggle_led()
+
     def get_knob_state(self, index):
         return self.knobs_state[index]
 
@@ -59,9 +65,23 @@ class RobotDriver:
     def trigger_button_cb(self, index):
         logger.info(f"Trigger button {index} callback.")
 
+    def set_servo_position(self, index: int, position: float):
+        logger.info(f"Set Servo {index}: {position}")
+        if 0 <= index < len(self.servos):
+            self.servos[index].set_position_norm(position)
+
+    def set_servo_stepped(self, index: int, position: float,
+                          duration: float):
+        logger.info(f"Set Servo {index}: {position} over {duration}s")
+        if 0 <= index < len(self.servos):
+            self.servos[index].set_position_stepped(
+                position, duration)
+
     def setup(self):
         for b in self.buttons:
             b.setup()
+        for s in self.servos:
+            s.setup()
 
     def cleanup(self):
         GPIO.cleanup()
@@ -90,8 +110,7 @@ def run_robot(server_mode, config):
         # Boostrap test
         for i in range(6):
             time.sleep(1)
-            for b in driver.leds:
-                b.toggle_led()
+            driver.toggle_all_leds()
 
     driver.cleanup()
 
