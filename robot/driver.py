@@ -19,6 +19,9 @@ logger = logging.getLogger(__name__)
 default_config = (pathlib.Path(__file__).parent.parent / "config" /
                   "config.yaml")
 
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
 
 class RobotDriver:
     N_LEDS = 4
