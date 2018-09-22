@@ -65,10 +65,9 @@ class Servo(object):
                              scale_fn=np.linspace):
         scaled_value = scale(dest_value, self.servo_range)
         value_steps = scale_fn(self.last_value, scaled_value, num=steps)
-
         for v in value_steps:
             self.set_position(v)
-            time.sleep(time_to_move / steps)
+            time.sleep(time_to_move / len(step_def))
 
 
 class ContinuousServo(Servo):
@@ -81,6 +80,15 @@ class ContinuousServo(Servo):
         self.fw_range = fw_servo_range
         self.stop_value = stop_value
 
+        self.last_float = 0.0
+
+    def set_position(self, value: int):
+        """Set the voltage value of the pwm."""
+        position_val = int(np.clip(value, *self.servo_range))
+        print(f"Servo {self} position: {position_val}")
+        self.pwm.set_pwm(self.channel, 0, position_val)
+        self.last_value = value
+
     def set_position_norm(self, value: float):
         if value == 0 or value < -1 or value > 1:
             self.set_position(0)
@@ -90,6 +98,17 @@ class ContinuousServo(Servo):
 
         elif value < 0:
             self.set_position(scale(dest_value, self.bw_range))
+
+        self.last_float = value
+
+    def set_position_stepped(self, dest_value: float,
+                             time_to_move: float, steps: int = 10,
+                             scale_fn=np.linspace):
+        # For this version we scale in norm space
+        steps = scale_fn(self.last_float, dest_value, num=steps)
+        for step_float in steps:
+            self.set_position_norm(step_float)
+            time.sleep(time_to_move / steps)
 
 
 @enum.unique
