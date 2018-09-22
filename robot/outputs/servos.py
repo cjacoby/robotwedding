@@ -72,8 +72,8 @@ class Servo(object):
 
 class ContinuousServo(Servo):
     def __init__(self, servo_channel: int,
-                 bw_servo_range: tuple = (4, 375),
-                 fw_servo_range: tuple = (380, 2048),
+                 bw_servo_range: tuple = (375, 4),
+                 fw_servo_range: tuple = (2048, 380),
                  stop_value: int = 0):
         self.channel = servo_channel
         self.bw_range = bw_servo_range
@@ -97,6 +97,7 @@ class ContinuousServo(Servo):
             self.set_position(scale(value, self.fw_range))
 
         elif value < 0:
+            value = np.abs(value)
             self.set_position(scale(value, self.bw_range))
 
         self.last_float = value
@@ -130,6 +131,6 @@ def servo_factory(servo_defs: list):
     servos = []
     for s in servo_defs:
         servo_type = s.pop('type')
-        servos.append(ServoType(servo_type).servo_cls(s))
+        servos.append(ServoType(servo_type).servo_cls(**s))
 
     return servos
