@@ -84,9 +84,8 @@ class ContinuousServo(Servo):
 
     def set_position(self, value: int):
         """Set the voltage value of the pwm."""
-        position_val = int(np.clip(value, *self.servo_range))
-        print(f"Servo {self} position: {position_val}")
-        self.pwm.set_pwm(self.channel, 0, position_val)
+        print(f"Servo {self} position: {value}")
+        self.pwm.set_pwm(self.channel, 0, value)
         self.last_value = value
 
     def set_position_norm(self, value: float):
