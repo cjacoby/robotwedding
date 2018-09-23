@@ -9,7 +9,6 @@ from collections import defaultdict
 import numpy as np
 
 
-@staticmethod
 def read_adc_spi_pin(adc_idx, clockpin, mosipin, misopin, cspin):
     """Read the value from a single SPI pin of the MCP3008 chip."""
     if ((adc_idx > 7) or (adc_idx < 0)):
