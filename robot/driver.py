@@ -11,8 +11,8 @@ except ImportError:
     import robot.dummyGPIO as GPIO
 
 import robot.sensors.buttons as buttons
+import robot.sensors.adc as robot_adc
 import robot.outputs.servos as servos
-import robot.outputs.adc as robot_adc
 import robot.servers.osc as osc_serve
 import robot.servers.http as http_serve
 
