@@ -106,6 +106,8 @@ class RobotDriver:
             while True:
                 self.adc.poll()
                 time.sleep(0.1)
+        except KeyboardInterrupt:
+            print("Stopping")
 
     def cleanup(self):
         GPIO.cleanup()
@@ -128,7 +130,7 @@ def run_robot(server_mode, config):
         http_serve.run_server(driver)
 
     elif server_mode == "standalone":
-        message = input("Press enter to quit\n\n")
+        driver.run()
 
     elif server_mode == "ledtest":
         # Boostrap test
