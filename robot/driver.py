@@ -118,7 +118,9 @@ class RobotDriver:
     ['osc', 'http', 'standalone', 'ledtest']))
 @click.option('-c', '--config', type=click.Path(exists=True),
               default=default_config)
-def run_robot(server_mode, config):
+@click.option('-v', '--verbose', count=True)
+def run_robot(server_mode, config, verbose):
+    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     config = anyconfig.load(config, ac_parser="yaml")
     driver = RobotDriver(config)
     driver.setup()
