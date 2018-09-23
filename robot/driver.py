@@ -12,6 +12,7 @@ except ImportError:
 
 import robot.sensors.buttons as buttons
 import robot.outputs.servos as servos
+import robot.outputs.adc as robot_adc
 import robot.servers.osc as osc_serve
 import robot.servers.http as http_serve
 
@@ -37,6 +38,22 @@ class RobotDriver:
         # self.leds = [False for i in range(self.N_LEDS)]
         # self.knobs_state = [0 for i in range(self.N_KNOBS)]
         self.servos = servos.servo_factory(config.get('servos', []))
+
+        callbacks = [
+            robot_adc.LambdaCallback(
+                lambda val: self.set_servo_position(0, val / 1024),
+                selected_pin=0),
+            robot_adc.LambdaCallback(
+                lambda val: self.set_servo_position(1, val / 1024),
+                selected_pin=1),
+            robot_adc.LambdaCallback(
+                lambda val: self.set_servo_position(2, val / 1024),
+                selected_pin=2),
+            robot_adc.LambdaCallback(
+                lambda val: self.set_servo_position(3, val / 1024),
+                selected_pin=3)
+        ]
+        self.adc = robot_adc.ADCPoller()
 
     def __repr__(self):
         return f"{self.__class__.__name__}()"
@@ -82,6 +99,13 @@ class RobotDriver:
             b.setup()
         for s in self.servos:
             s.setup()
+        self.adc.setup()
+
+    def run(self):
+        try:
+            while True:
+                self.adc.poll()
+                time.sleep(0.1)
 
     def cleanup(self):
         GPIO.cleanup()
