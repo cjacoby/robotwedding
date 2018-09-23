@@ -52,6 +52,8 @@ class RobotDriver:
             robot_adc.LambdaCallback(
                 lambda val: self.set_servo_position(3, val / 1024),
                 selected_pin=3)
+            robot_adc.ButtonCallbackLambda(4,
+                lambda: self.toggle_all_leds(); time.sleep(1); self.toggle_all_leds())
         ]
         self.adc = robot_adc.ADCPoller()
 
@@ -102,12 +104,13 @@ class RobotDriver:
         self.adc.setup()
 
     def run(self):
+        logger.info("Running Driver Server")
         try:
             while True:
                 self.adc.poll()
                 time.sleep(0.1)
         except KeyboardInterrupt:
-            print("Stopping")
+            logger.info("Stopping Driver (user cancelled)")
 
     def cleanup(self):
         GPIO.cleanup()
