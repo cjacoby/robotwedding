@@ -51,7 +51,7 @@ class RobotDriver:
                 selected_pin=2),
             robot_adc.LambdaCallback(
                 lambda val: self.set_servo_position(3, val / 1024),
-                selected_pin=3)
+                selected_pin=3),
             robot_adc.ButtonCallbackLambda(4,
                 lambda: self.toggle_all_leds(); time.sleep(1); self.toggle_all_leds())
         ]
