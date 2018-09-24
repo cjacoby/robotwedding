@@ -8,6 +8,7 @@ name = "pypi"
 "smbus2" = "*"
 "luma.lcd" = "*"
 "luma.core" = "*"
+click = "*"
 
 [dev-packages]
 
