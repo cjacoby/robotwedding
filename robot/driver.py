@@ -133,7 +133,8 @@ class RobotDriver:
 
 @click.command()
 @click.argument('server_mode', type=click.Choice(
-                ['osc', 'http', 'standalone', 'ledtest', 'drawtext']))
+                ['osc', 'http', 'standalone', 'ledtest', 'drawtext',
+                 'servotest']))
 @click.option('-c', '--config', type=click.Path(exists=True),
               default=default_config)
 @click.option('-v', '--verbose', count=True)
