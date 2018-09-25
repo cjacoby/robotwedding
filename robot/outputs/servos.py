@@ -42,22 +42,33 @@ class Servo(object):
         self.last_value = servo_range[0]
 
     def setup(self):
-        self.pwm = Adafruit_PCA9685.PCA9685()
+        try:
+            self.pwm = Adafruit_PCA9685.PCA9685()
 
-        # Set frequency to 60hz, good for servos.
-        # ... has to be 60
-        self.pwm.set_pwm_freq(60)
+            # Set frequency to 60hz, good for servos.
+            # ... has to be 60
+            self.pwm.set_pwm_freq(60)
+        except OSError:
+            logger.warning(f"Failed to open Servo/PWM module! (channel={self.channel})")
+            self.pwm = None
+
+    def safe_set_pwm(self, position):
+        if self.pwm is not None:
+            self.pwm.set_pwm(self.channel, 0, position)
+        else:
+            logger.warning("Can't set pwm state - not initialized")
 
     def set_position(self, value: int):
         """Set the voltage value of the pwm."""
         position_val = int(np.clip(value, *self.servo_range))
         print(f"Servo {self} position: {position_val}")
-        self.pwm.set_pwm(self.channel, 0, position_val)
-        self.last_value = value
+        self.safe_set_pwm(position_val)
+        self.last_value = position_val
 
     def set_position_norm(self, value: float):
-        value = np.clip(value, CLIP_MIN, CLIP_MAX)
+        value = np.clip(value, self.CLIP_MIN, self.CLIP_MAX)
         scaled_value = scale(value, self.servo_range)
+
         self.set_position(scaled_value)
 
     def set_position_stepped(self, dest_value: float,
@@ -86,7 +97,7 @@ class ContinuousServo(Servo):
         """Set the voltage value of the pwm."""
         value = int(value)
         print(f"Servo {self} position: {value}")
-        self.pwm.set_pwm(self.channel, 0, value)
+        self.safe_set_pwm(value)
         self.last_value = value
 
     def set_position_norm(self, value: float):
