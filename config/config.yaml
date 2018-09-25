@@ -25,3 +25,6 @@ servos:
     servo_channel: 8
   - type: servo
     servo_channel: 9
+
+display:
+  - type: oled

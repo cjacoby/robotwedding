@@ -13,6 +13,7 @@ except ImportError:
 import robot.sensors.buttons as buttons
 import robot.sensors.adc as robot_adc
 import robot.outputs.servos as servos
+import robot.outputs.display as robot_display
 import robot.servers.osc as osc_serve
 import robot.servers.http as http_serve
 
@@ -61,6 +62,9 @@ class RobotDriver:
         ]
         self.adc = robot_adc.ADCPoller()
 
+        self.displays = robot_display.display_factory(
+            config.get('display'))
+
     def __repr__(self):
         return f"{self.__class__.__name__}()"
 
@@ -100,12 +104,19 @@ class RobotDriver:
             self.servos[index].set_position_stepped(
                 position, duration, steps)
 
+    @property
+    def display(self):
+        if self.displays:
+            return self.displays[0]
+
     def setup(self):
         for b in self.buttons:
             b.setup()
         for s in self.servos:
             s.setup()
         self.adc.setup()
+        for d in self.displays:
+            d.setup()
 
     def run(self):
         logger.info("Running Driver Server")
@@ -121,8 +132,8 @@ class RobotDriver:
 
 
 @click.command()
-@click.option('-m', '--server_mode', type=click.Choice(
-    ['osc', 'http', 'standalone', 'ledtest']))
+@click.argument('server_mode', type=click.Choice(
+                ['osc', 'http', 'standalone', 'ledtest', 'drawtext']))
 @click.option('-c', '--config', type=click.Path(exists=True),
               default=default_config)
 @click.option('-v', '--verbose', count=True)
@@ -146,6 +157,18 @@ def run_robot(server_mode, config, verbose):
         for i in range(6):
             time.sleep(1)
             driver.toggle_all_leds()
+
+    elif server_mode == "drawtext":
+        try:
+            while True:
+                text = click.prompt("Text to display (q to quit)")
+                if text != 'q':
+                    driver.display.draw_text(text)
+                else:
+                    break
+
+        except KeyboardInterrupt:
+            pass
 
     driver.cleanup()
 
