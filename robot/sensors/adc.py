@@ -6,7 +6,10 @@ except ImportError:
     import robot.dummyGPIO as GPIO
 
 from collections import defaultdict
+import logging
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 def read_adc_spi_pin(adc_idx, clockpin, mosipin, misopin, cspin):
@@ -102,6 +105,7 @@ class ADCCallbackList(object):
         return iter(self.callbacks)
 
     def on_poll(self, pin_vals):
+        logger.debug(f"on_poll() : {pin_vals}")
         for callback in self.callbacks:
             callback.on_poll(pin_vals)
 
