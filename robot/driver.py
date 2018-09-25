@@ -170,6 +170,14 @@ def run_robot(server_mode, config, verbose):
         except KeyboardInterrupt:
             pass
 
+    elif server_mode = "servotest":
+        for s in driver.servos:
+            s.set_position_norm(0.0)
+            time.sleep(0.5)
+            s.set_position_norm(1.0)
+            time.sleep(0.5)
+            s.set_position_norm(0.0)
+
     driver.cleanup()
 
 
