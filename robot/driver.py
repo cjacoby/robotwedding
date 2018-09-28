@@ -161,7 +161,8 @@ class TestModeRunner(object):
         while True:
             adc_values = self.driver.read_adc_with_buttons()
 
-            display_text = str(adc_values)
+            # Split the values in half, and show one per line
+            display_text = f"{adc_values[0:4]}\n{adc_values[4:]}"
             if display_text != self.last_display:
                 self.driver.display.draw_text(display_text)
                 self.last_display = display_text
