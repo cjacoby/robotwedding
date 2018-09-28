@@ -171,7 +171,7 @@ class TestModeRunner(object):
             led_state_text = " ".join(
                 [f"{l.get_state()}" for l in self.driver.leds])
 
-            display_text = f"{display_text_03}\n{display_text_48}\n\n{led_state_text}"
+            display_text = f"ADC:\n{display_text_03}\n{display_text_48}\nLED:\n{led_state_text}\nServos:\n"
             if display_text != self.last_display:
                 self.driver.display.draw_text(display_text)
                 self.last_display = display_text

@@ -14,6 +14,7 @@ class LED(object):
 
     def setup(self):
         GPIO.setup(self.led_pin, GPIO.OUT)
+        self.set_state(self.led_state)
 
     def toggle_led(self):
         logger.debug(f"LED Toggle {self.led_pin}")
@@ -22,6 +23,9 @@ class LED(object):
             GPIO.output(self.led_pin, GPIO.LOW)
 
         self.led_state = not self.led_state
+        self.set_state(self.led_state)
+
+    def set_state(self, state):
         GPIO.output(self.led_pin, GPIO.HIGH if self.led_state else GPIO.LOW)
         logger.debug("LED State (pin", self.led_pin, ") :", self.led_state)
 
