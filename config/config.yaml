@@ -18,9 +18,9 @@ servos:
   - type: servo
     servo_channel: 1
   - type: servo
-    servo_channel: 2
+    servo_channel: 14
   - type: servo
-    servo_channel: 4
+    servo_channel: 15
   - type: servo
     servo_channel: 8
   - type: servo
