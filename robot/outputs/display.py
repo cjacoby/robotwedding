@@ -89,7 +89,7 @@ class OLEDDisplay(object):
 
             lines = []
             for line in text.split('\n'):
-                wrapped_lines = textwrap.wrap(text, self.char_width)
+                wrapped_lines = textwrap.wrap(line, self.char_width)
                 lines.extend(wrapped_lines)
 
             with canvas(virtual) as draw:
