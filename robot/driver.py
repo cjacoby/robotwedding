@@ -2,6 +2,7 @@
 import anyconfig
 import click
 import logging
+import numpy as np
 import pathlib
 import time
 
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 default_config = (pathlib.Path(__file__).parent.parent / "config" /
                   "config.yaml")
 
+np.set_printoptions(suppress=True)
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -109,6 +111,11 @@ class RobotDriver:
     def read_adc(self):
         return self.adc.poll()
 
+    def read_adc_with_buttons(self):
+        adc_vals = self.adc.poll()
+        adc_vals[4:] = 0 if adc_vals[4:] < 500 else adc_vals[4:]
+        return adc_vals
+
     @property
     def display(self):
         if self.displays:
@@ -151,7 +158,8 @@ class TestModeRunner(object):
 
     def run(self):
         while True:
-            adc_values = self.driver.read_adc()
+            adc_values = self.driver.read_adc_with_buttons()
+
             display_text = str(adc_values)
             if display_text != self.last_display:
                 self.driver.display.draw_text(display_text)
