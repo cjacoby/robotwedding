@@ -27,7 +27,7 @@ class GPIOButton(Button):
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=self.pud)
 
         GPIO.add_event_detect(self.pin, GPIO.RISING,
-                              callback=button_callback, bouncetime=200)
+                              callback=button_callback, bouncetime=220)
 
 
 class LEDPushButton(GPIOButton):

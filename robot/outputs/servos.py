@@ -48,9 +48,16 @@ class Servo(object):
             # Set frequency to 60hz, good for servos.
             # ... has to be 60
             self.pwm.set_pwm_freq(60)
+
+            # Initialize it to 0
+            self.set_position_norm(0)
         except OSError:
             logger.warning(f"Failed to open Servo/PWM module! (channel={self.channel})")
             self.pwm = None
+
+    @property
+    def position(self):
+        return self.last_value
 
     def safe_set_pwm(self, position):
         if self.pwm is not None:
@@ -92,6 +99,10 @@ class ContinuousServo(Servo):
         self.stop_value = stop_value
 
         self.last_float = 0.0
+
+    @property
+    def position(self):
+        return self.last_float
 
     def set_position(self, value: int):
         """Set the voltage value of the pwm."""
