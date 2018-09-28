@@ -79,11 +79,6 @@ class OLEDDisplay(object):
     def draw_text(self, text):
         logger.debug(f"Drawing: '{text}'")
 
-        lines = []
-        for line in text.split('\n'):
-            wrapped_lines = textwrap.wrap(text, self.char_width)
-            lines.extend(wrapped_lines)
-
         if self.echo_result:
             print(text)
 
@@ -91,6 +86,11 @@ class OLEDDisplay(object):
             virtual = viewport(self.device,
                                width=self.device.width,
                                height=self._settings['height'])
+
+            lines = []
+            for line in text.split('\n'):
+                wrapped_lines = textwrap.wrap(text, self.char_width)
+                lines.extend(wrapped_lines)
 
             with canvas(virtual) as draw:
                 for i, line in enumerate(lines):
