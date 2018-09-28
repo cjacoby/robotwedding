@@ -61,7 +61,10 @@ class Servo(object):
 
     def safe_set_pwm(self, position):
         if self.pwm is not None:
-            self.pwm.set_pwm(self.channel, 0, position)
+            try:
+                self.pwm.set_pwm(self.channel, 0, position)
+            except TypeError:
+                logger.exception(f"Tried to set servo {self.channel} to {position}")
         else:
             logger.warning("Can't set pwm state - not initialized")
 

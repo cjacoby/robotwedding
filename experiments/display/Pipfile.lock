@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c5d9c05cc3b9da07274024e52fd99ea4f448a9f2c8d197bfc14dbef386744832"
+            "sha256": "348834d305edf991653c2c4bf4abb6ac3b204dd3f19624dde9188c77a2ed6321"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,29 +16,37 @@
         ]
     },
     "default": {
-        "luma.core": {
+        "click": {
             "hashes": [
-                "sha256:0627c84f9bd48449baaca16f767c04bc71b8fc2fb9bdd48ef008adc749e4b972",
-                "sha256:b5028b1471b7a5a2df11aeccf7b3506cfff63710826259c5ad0dc5a1e9395866"
+                "sha256:29f99fc6125fbc931b758dc053b3114e55c77a6e4c6c3a2674a2dc986016381d",
+                "sha256:f15516df478d5a56180fbf80e68f206010e6d160fc39fa508b65e035fd75130b"
             ],
             "index": "pypi",
-            "version": "==1.7.2"
+            "version": "==6.7"
+        },
+        "luma.core": {
+            "hashes": [
+                "sha256:1114f544de25a33281fd214c60c64533c44b552f6fa2325c9b543e691379f8e2",
+                "sha256:c13fd396fb5db8ed994b28bb51ac618c28fedf9b163740f74206b5fa3fefb742"
+            ],
+            "index": "pypi",
+            "version": "==1.8.1"
         },
         "luma.lcd": {
             "hashes": [
-                "sha256:04a95ef5992c697e6c7c22de270e62bb1c79bafed43733366468dff9b155d77a",
-                "sha256:5306f69bfcc2556b793ce42d5143f00c106704acefb06287c54dc7a10c6b781d"
+                "sha256:0b2a5540c0a898ed751bfd4352be23919ed42b53d707c2d8d60e32b9e1050d5b",
+                "sha256:d8dba4ef2be2631acea2bce5abdc80914315bbb49e0d0b00839d29629f9524df"
             ],
             "index": "pypi",
-            "version": "==1.0.3"
+            "version": "==1.1.0"
         },
         "luma.oled": {
             "hashes": [
-                "sha256:57110ee26ad2d646a3ec1a154db531b8ee7f625c5dc01d86039b1697a32b4b2a",
-                "sha256:9da438e9b8b7b0a224c0c8c560d3d649540dd5ed74814aaf75bba9084bc7ebbf"
+                "sha256:39d6db9de0ce4cffc1c616ca181d49b124d69d2f24b819e6fe6e9c2a2df5e5e2",
+                "sha256:64e81154d1b55dffa5e06647b087ef87ddf7299698a9046f8dab0b1437ed918b"
             ],
             "index": "pypi",
-            "version": "==2.4.1"
+            "version": "==2.5.1"
         },
         "pillow": {
             "hashes": [
