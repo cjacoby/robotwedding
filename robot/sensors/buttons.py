@@ -3,6 +3,7 @@ try:
 except ImportError:
     import robot.dummyGPIO as GPIO
 
+from functools import partial
 import enum
 import logging
 
@@ -26,8 +27,12 @@ class GPIOButton(Button):
     def setup(self):
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=self.pud)
 
-        GPIO.add_event_detect(self.pin, GPIO.RISING,
-                              callback=button_callback, bouncetime=220)
+        GPIO.add_event_detect(
+            self.pin, GPIO.RISING,
+            callback=partial(button_callback,
+                             led=(self.led if hasattr(self, 'led')
+                                  else None)),
+            bouncetime=220)
 
 
 class LEDPushButton(GPIOButton):
@@ -75,5 +80,7 @@ def multi_button_factory(button_defs):
     return [button_factory(x) for x in button_defs]
 
 
-def button_callback(button_index):
+def button_callback(button_index, led):
     logger.info(f"Button callback {button_index}")
+
+    led.toggle_led()
