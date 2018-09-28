@@ -195,8 +195,8 @@ def run_robot(server_mode, config, verbose):
 
     elif server_mode == "ledtest":
         # Boostrap test
-        for i in range(6):
-            time.sleep(1)
+        while True:
+            time.sleep(0.5)
             driver.toggle_all_leds()
 
     elif server_mode == "drawtext":
