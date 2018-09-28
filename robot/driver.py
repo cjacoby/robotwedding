@@ -48,20 +48,21 @@ class RobotDriver:
 
         callbacks = [
             robot_adc.LambdaCallback(
-                lambda val: self.set_servo_position(0, val / 1024),
+                lambda val: self.set_servo_position(0, val[0] / 1024),
                 selected_pin=0),
-            robot_adc.LambdaCallback(
-                lambda val: self.set_servo_position(1, val / 1024),
-                selected_pin=1),
-            robot_adc.LambdaCallback(
-                lambda val: self.set_servo_position(2, val / 1024),
-                selected_pin=2),
-            robot_adc.LambdaCallback(
-                lambda val: self.set_servo_position(3, val / 1024),
-                selected_pin=3),
-            robot_adc.ButtonCallbackLambda(4, toggle_leds)
+            # robot_adc.LambdaCallback(
+            #     lambda val: self.set_servo_position(1, val / 1024),
+            #     selected_pin=1),
+            # robot_adc.LambdaCallback(
+            #     lambda val: self.set_servo_position(2, val / 1024),
+            #     selected_pin=2),
+            # robot_adc.LambdaCallback(
+            #     lambda val: self.set_servo_position(3, val / 1024),
+            #     selected_pin=3),
+            # robot_adc.ButtonCallbackLambda(4, toggle_leds)
         ]
         self.adc = robot_adc.ADCPoller()
+        self.adc.set_callbacks(callbacks)
 
         self.displays = robot_display.display_factory(
             config.get('display'))
