@@ -47,12 +47,12 @@ class RobotDriver:
             self.toggle_all_leds()
 
         callbacks = [
-            robot_adc.LambdaCallback(
-                lambda val: self.set_servo_position(0, val[0] / 1024),
-                selected_pin=0),
             # robot_adc.LambdaCallback(
-            #     lambda val: self.set_servo_position(1, val / 1024),
-            #     selected_pin=1),
+            #     lambda val: self.set_servo_position(0, val / 1024),
+            #     selected_pin=0),
+            robot_adc.LambdaCallback(
+                lambda val: self.set_servo_position(1, val / 1024),
+                selected_pin=1),
             # robot_adc.LambdaCallback(
             #     lambda val: self.set_servo_position(2, val / 1024),
             #     selected_pin=2),
