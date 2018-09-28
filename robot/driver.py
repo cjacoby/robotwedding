@@ -113,7 +113,8 @@ class RobotDriver:
 
     def read_adc_with_buttons(self):
         adc_vals = self.adc.poll()
-        adc_vals[4:] = 0 if adc_vals[4:] < 500 else adc_vals[4:]
+        ADC_BUTTON_THRESHOLD = 700
+        adc_vals[4:] = adc_vals[4:] * (adc_vals[4:] > ADC_BUTTON_THRESHOLD)
         return adc_vals
 
     @property
