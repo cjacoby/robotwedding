@@ -167,7 +167,11 @@ class TestModeRunner(object):
                 [f"{adc_values[i]:1.1f}" for i in range(0, 4)])
             display_text_48 = " ".join(
                 [f"{adc_values[i]:1.1f}" for i in range(4, 8)])
-            display_text = f"{display_text_03}\n{display_text_48}"
+
+            led_state_text = " ".join(
+                [f"{l.get_state()}" for l in self.driver.leds])
+
+            display_text = f"{display_text_03}\n{display_text_48}\n\n{led_state_text}"
             if display_text != self.last_display:
                 self.driver.display.draw_text(display_text)
                 self.last_display = display_text
