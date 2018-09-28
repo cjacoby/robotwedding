@@ -32,5 +32,9 @@ def output(*args, **kwargs):
     pass
 
 
+def input(*args, **kwargs):
+    pass
+
+
 def cleanup():
     pass

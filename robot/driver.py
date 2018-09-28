@@ -37,7 +37,6 @@ class RobotDriver:
         self.leds = [x.led for x in self.buttons
                      if isinstance(x, buttons.LEDPushButton)]
         # self.leds = [False for i in range(self.N_LEDS)]
-        # self.knobs_state = [0 for i in range(self.N_KNOBS)]
         self.servos = servos.servo_factory(config.get('servos', []))
 
         def toggle_leds():
@@ -66,7 +65,10 @@ class RobotDriver:
             config.get('display'))
 
     def __repr__(self):
-        return f"{self.__class__.__name__}()"
+        return (f"{self.__class__.__name__}("
+                f"n_buttons={len(self.buttons)}, "
+                f"n_leds={self.get_n_leds()},"
+                f"n_servos={len(self.servos)})")
 
     def get_n_leds(self):
         return len(self.leds)
@@ -104,6 +106,9 @@ class RobotDriver:
             self.servos[index].set_position_stepped(
                 position, duration, steps)
 
+    def read_adc(self):
+        return self.adc.poll()
+
     @property
     def display(self):
         if self.displays:
@@ -127,14 +132,39 @@ class RobotDriver:
         except KeyboardInterrupt:
             logger.info("Stopping Driver (user cancelled)")
 
+    def run_test_mode(self):
+        logger.info("Starting Run Loop")
+
+        runner = TestModeRunner(self)
+        runner.run()
+
     def cleanup(self):
         GPIO.cleanup()
+
+
+class TestModeRunner(object):
+    def __init__(self, driver, poll_interval=0.2):
+        self.driver = driver
+        self.poll_interval = poll_interval
+
+        self.last_display = None
+
+    def run(self):
+        while True:
+            adc_values = self.driver.read_adc()
+            display_text = str(adc_values)
+            if display_text != self.last_display:
+                self.driver.display.draw_text(display_text)
+                self.last_display = display_text
+
+            logger.debug("Polling Sensors")
+            time.sleep(self.poll_interval)
 
 
 @click.command()
 @click.argument('server_mode', type=click.Choice(
                 ['osc', 'http', 'standalone', 'ledtest', 'drawtext',
-                 'servotest']))
+                 'servotest', 'test']))
 @click.option('-c', '--config', type=click.Path(exists=True),
               default=default_config)
 @click.option('-v', '--verbose', count=True)
@@ -178,6 +208,10 @@ def run_robot(server_mode, config, verbose):
             s.set_position_norm(1.0)
             time.sleep(0.5)
             s.set_position_norm(0.0)
+
+    elif server_mode == "test":
+        driver.run_test_mode()
+
 
     driver.cleanup()
 

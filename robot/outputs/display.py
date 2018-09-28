@@ -47,7 +47,8 @@ class OLEDDisplay(object):
                  'v_offset': 0,
                  'width': 128}
 
-    def __init__(self, **kwargs):
+    def __init__(self, echo_result=True, **kwargs):
+        self.echo_result = echo_result
         self._settings.update(**kwargs)
 
     def setup(self):
@@ -76,7 +77,9 @@ class OLEDDisplay(object):
                    gpio=None)
 
     def draw_text(self, text):
-        logger.info(f"Drawing: '{text}'")
+        logger.debug(f"Drawing: '{text}'")
+        if self.echo_result:
+            print(text)
 
         if self.device is not None:
             lines = textwrap.wrap(text, self.char_width)
@@ -88,7 +91,8 @@ class OLEDDisplay(object):
                 for i, line in enumerate(lines):
                     draw.text((0, i * 12), text=line, fill="white")
         else:
-            logger.warning(f"Cannot draw text - no OLED library found; text={text}")
+            logger.warning(
+                f"Cannot draw text - no OLED library found; text={text}")
 
 
 def display_factory(config):

@@ -13,14 +13,14 @@ buttons:
     led_pin: 24
 
 servos:
-  - type: servo
+  - type: continuous
     servo_channel: 0
   - type: servo
     servo_channel: 1
   - type: servo
+    servo_channel: 
+  - type: servo
     servo_channel: 4
-  - type: continuous
-    servo_channel: 5
   - type: servo
     servo_channel: 8
   - type: servo
@@ -28,3 +28,5 @@ servos:
 
 display:
   - type: oled
+    echo_result: true
+
