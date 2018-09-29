@@ -5,7 +5,7 @@ Display text on an OLED screen.
 import click
 import logging
 import textwrap
-
+import time
 
 # ignore PIL debug messages
 logging.getLogger('PIL').setLevel(logging.ERROR)
@@ -107,6 +107,14 @@ def display_factory(config):
         if display_type == 'oled':
             displays.append(OLEDDisplay(**c))
     return displays
+
+
+def run_test():
+    oled = OLEDDisplay()
+    oled.setup()
+
+    oled.draw_text("This is a test")
+    time.sleep(1)
 
 
 @click.command()

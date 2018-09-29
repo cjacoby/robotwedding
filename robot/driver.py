@@ -152,6 +152,10 @@ class RobotDriver:
         logger.info("Running sound test")
         robot_sound.run_test()
 
+    def run_display_test(self):
+        logger.info("Running display test")
+        robot_display.run_test()
+
     def cleanup(self):
         GPIO.cleanup()
 
@@ -192,7 +196,7 @@ class TestModeRunner(object):
 @click.command()
 @click.argument('server_mode', type=click.Choice(
                 ['osc', 'http', 'standalone', 'ledtest', 'drawtext',
-                 'servotest', 'test', 'soundtest']))
+                 'servotest', 'test', 'soundtest', 'screentest']))
 @click.option('-c', '--config', type=click.Path(exists=True),
               default=default_config)
 @click.option('-v', '--verbose', count=True)
@@ -216,6 +220,9 @@ def run_robot(server_mode, config, verbose):
         while True:
             time.sleep(0.5)
             driver.toggle_all_leds()
+
+    elif server_mode == "screentest":
+        driver.run_display_test()
 
     elif server_mode == "soundtest":
         driver.run_sound_test()
