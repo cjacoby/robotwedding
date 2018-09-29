@@ -12,7 +12,7 @@ wav_file = RESOURCES / "dt01_stab_britelite_16.wav"
 
 class Note(Sound):
 
-    def __init__(self, frequency, volume=.1, sample_rate=44100):
+    def __init__(self, frequency, volume=.8, sample_rate=44100):
         self.frequency = frequency
         self.sr = sample_rate
         Sound.__init__(self, self.build_samples())
