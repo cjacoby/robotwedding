@@ -21,6 +21,7 @@ servos:
     servo_channel: 14
   - type: servo
     servo_channel: 15
+    servo_range: [125, 625]
   - type: servo
     servo_channel: 8
   - type: servo
@@ -29,4 +30,3 @@ servos:
 display:
   - type: oled
     echo_result: true
-
