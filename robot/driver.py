@@ -13,8 +13,9 @@ except ImportError:
 
 import robot.sensors.buttons as buttons
 import robot.sensors.adc as robot_adc
-import robot.outputs.servos as servos
 import robot.outputs.display as robot_display
+import robot.outputs.servos as servos
+import robot.outputs.sound as robot_sound
 import robot.servers.osc as osc_serve
 import robot.servers.http as http_serve
 
@@ -147,6 +148,10 @@ class RobotDriver:
         runner = TestModeRunner(self)
         runner.run()
 
+    def run_sound_test(self):
+        logger.info("Running sound test")
+        robot_sound.run_test()
+
     def cleanup(self):
         GPIO.cleanup()
 
@@ -187,7 +192,7 @@ class TestModeRunner(object):
 @click.command()
 @click.argument('server_mode', type=click.Choice(
                 ['osc', 'http', 'standalone', 'ledtest', 'drawtext',
-                 'servotest', 'test']))
+                 'servotest', 'test', 'soundtest']))
 @click.option('-c', '--config', type=click.Path(exists=True),
               default=default_config)
 @click.option('-v', '--verbose', count=True)
@@ -211,6 +216,9 @@ def run_robot(server_mode, config, verbose):
         while True:
             time.sleep(0.5)
             driver.toggle_all_leds()
+
+    elif server_mode == "soundtest":
+        driver.run_sound_test()
 
     elif server_mode == "drawtext":
         try:
