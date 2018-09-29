@@ -4,6 +4,7 @@ import pathlib
 import pygame
 import subprocess
 import tempfile
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -24,11 +25,24 @@ def speech_to_wav(text, output_file):
 class SoundResource(object):
     def __init__(self):
         self.speech_dir = tempfile.TemporaryDirectory()
-        self.sr = 22050
+        self.speech_map = dict()
+        self.sr = 44010
 
     def setup(self):
         pygame.mixer.pre_init(self.sr, -16, 1)
         pygame.mixer.init()
+
+    def play_speech(self, text):
+        if text in self.speech_map:
+            output_path = self.speech_map[hash(text)]
+        else:
+            filename = f"{str(uuid.uuid4()).replace('-', '')}.wav"
+            output_path = pathlib.Path(self.speech_dir.name) / filename
+
+            speech_to_wav(text, output_path)
+            self.speech_map[hash(text)] = output_path
+
+        self.play_file(output_path)
 
     def play_init_sound(self):
         # if wav_files[0].exists():
@@ -79,6 +93,9 @@ def run_test():
     sound.play_sin(880)
     sound.play_sin(880 * 2)
     sound.play_noise()
+    sound.play_speech("This is a test")
+    sound.play_speech("I am robot.")
+    sound.play_speech("Hear me roar.")
     sound.play_init_sound()
 
 
