@@ -273,8 +273,8 @@ class TestAsyncRunner(object):
 
     async def update_display(self):
         if self.this_display != self.last_display:
-            self.driver.display.draw_text(display_text)
-            self.last_display = display_text
+            self.driver.display.draw_text(self.this_display)
+            self.last_display = self.this_display
 
         await asyncio.sleep(self.display_poll)
 
