@@ -18,7 +18,10 @@ def speak(text):
 
 
 def speech_to_wav(text, output_file):
-    subprocess.run(["flite", "-t", text, "-o", output_file])
+    try:
+        subprocess.run(["flite", "-t", text, "-o", output_file])
+    except FileNotFoundError:
+        logger.error("No flite to run")
     return pathlib.Path(output_file).exists()
 
 
