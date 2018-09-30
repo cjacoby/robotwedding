@@ -216,8 +216,9 @@ class TestAsyncRunner(object):
             loop = asyncio.get_event_loop()
 
             tasks = [
-                asyncio.ensure_future(self.draw_counter()),
-                asyncio.ensure_future(self.play_sound())
+                # asyncio.ensure_future(self.draw_counter()),
+                asyncio.ensure_future(self.play_sound()),
+                asyncio.ensure_future(self.update_and_display())
             ]
 
             loop.run_until_complete(asyncio.wait(tasks))
@@ -240,34 +241,30 @@ class TestAsyncRunner(object):
             await self.driver.sound.aplay_sin(np.random.choice(freqs))
             await asyncio.sleep(2 + np.random.random())
 
-    # async def arun(self):
-    #     print("foo")
-    #     await asyncio.sleep(1)
-    #     print("bar")
-    #     await asyncio.sleep(1)
-        # while True:
-        #     adc_values = self.driver.read_adc_with_buttons()
-        #     adc_values = adc_values / 1024
+    async def update_and_display(self):
+        while True:
+            adc_values = self.driver.read_adc_with_buttons()
+            adc_values = adc_values / 1024
 
-        #     # Split the values in half, and show one per line
-        #     display_text_03 = " ".join(
-        #         [f"{adc_values[i]:1.1f}" for i in range(0, 4)])
-        #     display_text_48 = " ".join(
-        #         [f"{adc_values[i]:1.1f}" for i in range(4, 8)])
+            # Split the values in half, and show one per line
+            display_text_03 = " ".join(
+                [f"{adc_values[i]:1.1f}" for i in range(0, 4)])
+            display_text_48 = " ".join(
+                [f"{adc_values[i]:1.1f}" for i in range(4, 8)])
 
-        #     led_state_text = " ".join(
-        #         [f"{l.get_state()}" for l in self.driver.leds])
+            led_state_text = " ".join(
+                [f"{l.get_state()}" for l in self.driver.leds])
 
-        #     servo_state_text = " ".join(
-        #         [f"{s.position}" for s in self.driver.servos])
+            servo_state_text = " ".join(
+                [f"{s.position}" for s in self.driver.servos])
 
-        #     display_text = f"ADC:\n{display_text_03}\n{display_text_48}\nLED:\n{led_state_text}\nServos:\n{servo_state_text}"
-        #     if display_text != self.last_display:
-        #         self.driver.display.draw_text(display_text)
-        #         self.last_display = display_text
+            display_text = f"ADC:\n{display_text_03}\n{display_text_48}\nLED:\n{led_state_text}\nServos:\n{servo_state_text}"
+            if display_text != self.last_display:
+                self.driver.display.draw_text(display_text)
+                self.last_display = display_text
 
-        #     logger.debug("Polling Sensors")
-        #     time.sleep(self.poll_interval)
+            logger.debug("Polling Sensors")
+            await asyncio.sleep(self.poll_interval)
 
 
 @click.command()
