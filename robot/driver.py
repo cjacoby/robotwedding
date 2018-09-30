@@ -1,5 +1,6 @@
 """The main robot 'driver' lives here."""
 import anyconfig
+import asyncio
 import click
 import logging
 import numpy as np
@@ -68,6 +69,8 @@ class RobotDriver:
         self.displays = robot_display.display_factory(
             config.get('display'))
 
+        self.sound = robot_sound.SoundResource()
+
     def __repr__(self):
         return (f"{self.__class__.__name__}("
                 f"n_buttons={len(self.buttons)}, "
@@ -132,6 +135,7 @@ class RobotDriver:
         self.adc.setup()
         for d in self.displays:
             d.setup()
+        self.sound.setup()
 
     def run(self):
         logger.info("Running Driver Server")
@@ -146,6 +150,12 @@ class RobotDriver:
         logger.info("Starting Run Loop")
 
         runner = TestModeRunner(self)
+        runner.run()
+
+    def run_test_async(self):
+        logger.info("Starting Run Loop")
+
+        runner = TestAsyncRunner(self)
         runner.run()
 
     def run_sound_test(self):
@@ -193,10 +203,77 @@ class TestModeRunner(object):
             time.sleep(self.poll_interval)
 
 
+class TestAsyncRunner(object):
+    def __init__(self, driver, poll_interval=0.2):
+        self.driver = driver
+        self.poll_interval = poll_interval
+
+        self.last_display = None
+
+    def run(self):
+        logger.info("Launching async event loop")
+        try:
+            loop = asyncio.get_event_loop()
+
+            tasks = [
+                asyncio.ensure_future(self.draw_counter()),
+                asyncio.ensure_future(self.play_sound())
+            ]
+
+            loop.run_until_complete(asyncio.wait(tasks))
+
+        finally:
+            loop.run_until_complete(loop.shutdown_asyncgens())
+            loop.close()
+        logger.info("Async event loop complete")
+
+    async def draw_counter(self):
+        i = 0
+        while True:
+            self.driver.display.draw_text(f"{i}")
+            await asyncio.sleep(0.5)
+            i += 1
+
+    async def play_sound(self):
+        freqs = [220, 440, 500, 678, 900, 1223]
+        while True:
+            await self.driver.sound.aplay_sin(np.random.choice(freqs))
+            await asyncio.sleep(2 + np.random.random())
+
+    # async def arun(self):
+    #     print("foo")
+    #     await asyncio.sleep(1)
+    #     print("bar")
+    #     await asyncio.sleep(1)
+        # while True:
+        #     adc_values = self.driver.read_adc_with_buttons()
+        #     adc_values = adc_values / 1024
+
+        #     # Split the values in half, and show one per line
+        #     display_text_03 = " ".join(
+        #         [f"{adc_values[i]:1.1f}" for i in range(0, 4)])
+        #     display_text_48 = " ".join(
+        #         [f"{adc_values[i]:1.1f}" for i in range(4, 8)])
+
+        #     led_state_text = " ".join(
+        #         [f"{l.get_state()}" for l in self.driver.leds])
+
+        #     servo_state_text = " ".join(
+        #         [f"{s.position}" for s in self.driver.servos])
+
+        #     display_text = f"ADC:\n{display_text_03}\n{display_text_48}\nLED:\n{led_state_text}\nServos:\n{servo_state_text}"
+        #     if display_text != self.last_display:
+        #         self.driver.display.draw_text(display_text)
+        #         self.last_display = display_text
+
+        #     logger.debug("Polling Sensors")
+        #     time.sleep(self.poll_interval)
+
+
 @click.command()
 @click.argument('server_mode', type=click.Choice(
                 ['osc', 'http', 'standalone', 'ledtest', 'drawtext',
-                 'servotest', 'test', 'soundtest', 'screentest']))
+                 'servotest', 'test', 'soundtest', 'screentest', 'asynctest']))
 @click.option('-c', '--config', type=click.Path(exists=True),
               default=default_config)
 @click.option('-v', '--verbose', count=True)
@@ -250,6 +327,8 @@ def run_robot(server_mode, config, verbose):
     elif server_mode == "test":
         driver.run_test_mode()
 
+    elif server_mode == "asynctest":
+        driver.run_test_async()
 
     driver.cleanup()
 

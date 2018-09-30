@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import numpy as np
 import pathlib
@@ -59,6 +60,9 @@ class SoundResource(object):
         #     logger.info("failed to play; file does not exist")
         self.play_file(wav_files[0])
 
+    async def aplay_init_sound(self):
+        await self.play_file(wav_files[0])
+
     def play_file(self, path):
         if path.exists():
             sound = pygame.mixer.Sound(str(path))
@@ -69,13 +73,32 @@ class SoundResource(object):
         else:
             logger.info("failed to play; file does not exist")
 
-    def play_sin(self, freq=440):
+    async def aplay_file(self, path):
+        if path.exists():
+            sound = pygame.mixer.Sound(str(path))
+            duration = sound.get_length()
+            sound.play()
+            await asyncio.sleep(duration)
+
+        else:
+            logger.info("failed to play; file does not exist")
+
+    def play_sin(self, freq=440, dur=1):
         arr = np.array([
             4096 * np.sin(2.0 * np.pi * freq * x / self.sr)
             for x in range(0, self.sr)]).astype(np.int16)
         sound = pygame.sndarray.make_sound(arr)
         sound.play()
-        pygame.time.delay(1000)
+        pygame.time.delay(dur * 1000)
+        sound.stop()
+
+    async def aplay_sin(self, freq=440, dur=1):
+        arr = np.array([
+            4096 * np.sin(2.0 * np.pi * freq * x / self.sr)
+            for x in range(0, self.sr)]).astype(np.int16)
+        sound = pygame.sndarray.make_sound(arr)
+        sound.play()
+        await asyncio.sleep(dur)
         sound.stop()
 
     def play_noise(self):
@@ -85,6 +108,16 @@ class SoundResource(object):
         sound = pygame.sndarray.make_sound(arr)
         sound.play()
         pygame.time.delay(1000)
+        sound.stop()
+
+    async def aplay_noise(self, ):
+        """play noise with async wait"""
+        arr = np.array([
+            4096 * np.random.random()
+            for x in range(0, self.sr)]).astype(np.int16)
+        sound = pygame.sndarray.make_sound(arr)
+        sound.play()
+        await asyncio.sleep(dur)
         sound.stop()
 
 

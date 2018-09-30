@@ -1,9 +1,12 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+
 [packages]
+
 anyconfig = "*"
 pyyaml = "*"
 python-osc = "*"
@@ -14,8 +17,15 @@ pytest = "*"
 "adafruit-pca9685" = "*"
 numpy = "*"
 talkey = "*"
+pygame = "*"
+pyglet = "*"
+pillow = "*"
+
 
 [dev-packages]
 
+
+
 [requires]
+
 python_version = "3.6"
