@@ -204,10 +204,13 @@ class TestModeRunner(object):
 
 
 class TestAsyncRunner(object):
-    def __init__(self, driver, poll_interval=0.2):
+    def __init__(self, driver, adc_poll_interval=0.01,
+                 display_poll=0.25):
         self.driver = driver
-        self.poll_interval = poll_interval
+        self.adc_poll_interval = adc_poll_interval
+        self.display_poll = display_poll
 
+        self.this_display = None
         self.last_display = None
 
     def run(self):
@@ -218,7 +221,8 @@ class TestAsyncRunner(object):
             tasks = [
                 # asyncio.ensure_future(self.draw_counter()),
                 asyncio.ensure_future(self.play_sound()),
-                asyncio.ensure_future(self.update_and_display())
+                asyncio.ensure_future(self.update_adc()),
+                asyncio.ensure_future(self.update_display())
             ]
 
             loop.run_until_complete(asyncio.wait(tasks))
@@ -241,7 +245,10 @@ class TestAsyncRunner(object):
             await self.driver.sound.aplay_sin(np.random.choice(freqs))
             await asyncio.sleep(2 + np.random.random())
 
-    async def update_and_display(self):
+    def set_display_text(self, text):
+        self.this_display = text
+
+    async def update_adc(self):
         while True:
             adc_values = self.driver.read_adc_with_buttons()
             adc_values = adc_values / 1024
@@ -259,13 +266,17 @@ class TestAsyncRunner(object):
                 [f"{s.position}" for s in self.driver.servos])
 
             display_text = f"ADC:\n{display_text_03}\n{display_text_48}\nLED:\n{led_state_text}\nServos:\n{servo_state_text}"
-            if display_text != self.last_display:
-                self.driver.display.draw_text(display_text)
-                self.last_display = display_text
+            self.set_display_text(display_text)
 
             logger.debug("Polling Sensors")
-            await asyncio.sleep(self.poll_interval)
+            await asyncio.sleep(self.adc_poll_interval)
 
+    async def update_display(self):
+        if self.this_display != self.last_display:
+            self.driver.display.draw_text(display_text)
+            self.last_display = display_text
+
+        await asyncio.sleep(self.display_poll)
 
 @click.command()
 @click.argument('server_mode', type=click.Choice(
