@@ -120,6 +120,15 @@ class OLEDDisplay(object):
         background.paste(img, posn)
         self.device.display(background.convert(self.device.mode))
 
+    def fill_rgb(self, r, g, b):
+        if self.device is not None:
+            virtual = viewport(self.device,
+                               width=self.device.width,
+                               height=self._settings['height'])
+            with canvas(virtual) as draw:
+                draw.rectangle([(0, 0), (self.device.width, self.device.height)], fill=f"rgb({r},{g},{b})")
+
+
     def move_and_draw_strs(self):
         def init_stars(num_stars, max_depth):
             stars = []
@@ -183,16 +192,23 @@ def run_test():
     oled.setup()
 
     oled.draw_text("This is a test")
-    time.sleep(1)
-    for i in range(60):
+    time.sleep(0.3)
+    for i in range(15):
         oled.move_and_draw_strs()
         time.sleep(.02)
 
-    time.sleep(1)
+    time.sleep(0.5)
     oled.draw_image(RESOURCES / "heart1.jpg")
-    time.sleep(1)
+    time.sleep(0.5)
     oled.draw_image(RESOURCES / "heart2.jpg")
     time.sleep(.5)
+    oled.fill_rgb(255, 0, 0)
+    time.sleep(0.25)
+    oled.fill_rgb(255, 0, 0)
+    time.sleep(0.25)
+    oled.fill_rgb(0, 255, 0)
+    time.sleep(0.25)
+    oled.fill_rgb(0, 0, 255)
 
 
 @click.command()
