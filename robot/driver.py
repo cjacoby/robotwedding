@@ -139,10 +139,9 @@ class RobotDriver:
 
     def run(self):
         logger.info("Running Driver Server")
+        runner = robot_runners.RobotStateMachineRunner(self)
         try:
-            while True:
-                self.adc.poll()
-                time.sleep(0.1)
+            runner.run()
         except KeyboardInterrupt:
             logger.info("Stopping Driver (user cancelled)")
 

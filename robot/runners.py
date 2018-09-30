@@ -1,6 +1,8 @@
 import asyncio
+import enum
 import logging
 import numpy as np
+from queue import Queue
 
 logger = logging.getLogger(__name__)
 
@@ -114,4 +116,57 @@ class TestAsyncRunner(object):
         await asyncio.sleep(self.display_poll)
 
 
-# class 
+@enum.unique
+class RobotStates(enum.Enum):
+    DEFAULT = 0
+    BEEP_BOOP = 1
+    WHIMSICAL_TASKS = 2
+    POLL_QA = 3
+    RANDOM_FACTOIDS = 4
+
+
+class RobotStateMachineRunner(object):
+    """Class which manages the main event loop of the 'real' robot mode.
+    """
+    def __init__(self, driver):
+        self.driver = driver
+        self.current_state = RobotStates.DEFAULT
+        self.state_change_event = asyncio.Event()
+
+    def run(self):
+        logger.info("Beggining State Machine")
+        try:
+            loop = asyncio.get_event_loop()
+
+            tasks = [
+                asyncio.ensure_future(self.run_state_machine_controller()),
+                asyncio.ensure_future(self.random_state_changes())
+            ]
+
+            loop.run_until_complete(asyncio.wait(tasks))
+
+        finally:
+            loop.run_until_complete(loop.shutdown_asyncgens())
+            loop.close()
+        logger.info("Async event loop complete")
+
+    async def run_state_machine_controller(self):
+        while True:
+            logger.info("Back to sleep")
+            await self.state_change_event.wait()
+            logger.info(f"State change! {self.current_state}")
+            self.state_change_event.clear()
+
+    async def random_state_changes(self):
+        while True:
+            # Wait some random number of seconds
+            sleep_time = np.random.random() + 3
+            logger.info(f"State change sleep time: {sleep_time}")
+            await asyncio.sleep(sleep_time)
+
+            # Set a new state
+            self.current_state = np.random.randint(5)
+
+            logger.info(f"Set: {self.current_state}")
+            self.state_change_event.set()
+            logger.info(f"Set: {self.current_state}")
