@@ -4,12 +4,17 @@ Display text on an OLED screen.
 """
 import click
 import logging
+from random import randrange
 import textwrap
 import time
+from PIL import Image
+import pathlib
 
 # ignore PIL debug messages
 logging.getLogger('PIL').setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
+
+RESOURCES = pathlib.Path(__file__).resolve().parent.parent.parent / "resources"
 
 try:
     from luma.core.render import canvas
@@ -99,6 +104,70 @@ class OLEDDisplay(object):
             logger.warning(
                 f"Cannot draw text - no OLED library found; text={text}")
 
+    def draw_image(self, path, angle=0):
+        if self.device is None:
+            return
+
+        image = Image.open(path).convert("RGBA")
+        image.thumbnail((self.device.width, self.device.height))
+        fff = Image.new(image.mode, image.size, (255,) * 4)
+
+        background = Image.new("RGBA", self.device.size, "white")
+        posn = ((self.device.width - image.width) // 2, 0)
+
+        rot = image.rotate(angle, resample=Image.BILINEAR)
+        img = Image.composite(rot, fff, rot)
+        background.paste(img, posn)
+        self.device.display(background.convert(self.device.mode))
+
+    def move_and_draw_strs(self):
+        def init_stars(num_stars, max_depth):
+            stars = []
+            for i in range(num_stars):
+                # A star is represented as a list with this format: [X,Y,Z]
+                star = [randrange(-25, 25), randrange(-25, 25), randrange(1, max_depth)]
+                stars.append(star)
+            return stars
+
+        origin_x = self.device.width // 2
+        origin_y = self.device.height // 2
+
+        if self.device is None:
+            logger.warning(f"Cannot draw - no OLED")
+            return
+
+        with canvas(self.device) as draw:
+            max_depth = 32
+            stars = init_stars(512, max_depth)
+            for star in stars:
+                # The Z component is decreased on each frame.
+                star[2] -= 0.19
+
+                # If the star has past the screen (I mean Z<=0) then we
+                # reposition it far away from the screen (Z=max_depth)
+                # with random X and Y coordinates.
+                if star[2] <= 0:
+                    star[0] = randrange(-25, 25)
+                    star[1] = randrange(-25, 25)
+                    star[2] = max_depth
+
+                # Convert the 3D coordinates to 2D using perspective projection.
+                k = 128.0 / star[2]
+                x = int(star[0] * k + origin_x)
+                y = int(star[1] * k + origin_y)
+
+                # Draw the star (if it is visible in the screen).
+                # We calculate the size such that distant stars are smaller than
+                # closer stars. Similarly, we make sure that distant stars are
+                # darker than closer stars. This is done using Linear Interpolation.
+                if 0 <= x < self.device.width and 0 <= y < self.device.height:
+                    size = (1 - float(star[2]) / max_depth) * 4
+                    if (self.device.mode == "RGB"):
+                        shade = (int(100 + (1 - float(star[2]) / max_depth) * 155),) * 3
+                    else:
+                        shade = "white"
+                    draw.rectangle((x, y, x + size, y + size), fill=shade)
+
 
 def display_factory(config):
     displays = []
@@ -115,6 +184,15 @@ def run_test():
 
     oled.draw_text("This is a test")
     time.sleep(1)
+    for i in range(60):
+        oled.move_and_draw_strs()
+        time.sleep(.02)
+
+    time.sleep(1)
+    oled.draw_image(RESOURCES / "heart1.jpg")
+    time.sleep(1)
+    oled.draw_image(RESOURCES / "heart2.jpg")
+    time.sleep(.5)
 
 
 @click.command()
