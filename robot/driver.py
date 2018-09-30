@@ -18,6 +18,7 @@ import robot.outputs.servos as servos
 import robot.outputs.sound as robot_sound
 import robot.servers.osc as osc_serve
 import robot.servers.http as http_serve
+import robot.runners as robot_runners
 
 logger = logging.getLogger(__name__)
 
@@ -151,13 +152,13 @@ class RobotDriver:
     def run_test_mode(self):
         logger.info("Starting Run Loop")
 
-        runner = TestModeRunner(self)
+        runner = robot_runners.TestModeRunner(self)
         runner.run()
 
-    def run_test_async(self):
+    def run_async_test(self):
         logger.info("Starting Run Loop")
 
-        runner = TestAsyncRunner(self)
+        runner = robot_runners.TestAsyncRunner(self)
         runner.run()
 
     def run_led_test(self):
