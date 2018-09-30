@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 anyconfig = "*"
 pyyaml = "*"
 python-osc = "*"
@@ -21,11 +18,9 @@ pygame = "*"
 pyglet = "*"
 pillow = "*"
 
-
 [dev-packages]
-
-
+pylint = "*"
+mypy = "*"
 
 [requires]
-
 python_version = "3.6"

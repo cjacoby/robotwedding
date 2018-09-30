@@ -6,6 +6,7 @@ except ImportError:
     import robot.dummyGPIO as GPIO
 
 from collections import defaultdict
+from typing import Callable, Collection, Optional, Sequence
 import logging
 import numpy as np
 
@@ -126,9 +127,12 @@ class ADCPoller(object):
     """
     N_ANALOG = 8
 
-    def __init__(self, spi_clk=16, spi_miso=19,
-                 spi_mosi=20, spi_cs=21,
-                 callbacks=None):
+    def __init__(self,
+                 spi_clk: int = 16,
+                 spi_miso: int = 19,
+                 spi_mosi: int = 20,
+                 spi_cs: int = 21,
+                 callbacks: Optional[Collection[ADCCallback]] = None) -> None:
         self.spi_clk = spi_clk
         self.spi_miso = spi_miso
         self.spi_mosi = spi_mosi
@@ -139,18 +143,19 @@ class ADCPoller(object):
         self.change_tolerance = 5
         self.set_callbacks(callbacks)
 
-    def set_callbacks(self, callbacks):
+    def set_callbacks(self,
+                      callbacks: Optional[Collection[ADCCallback]]) -> None:
         _callbacks = callbacks or []
         self.callbacks = ADCCallbackList(_callbacks)
 
-    def setup(self):
+    def setup(self) -> None:
         # set up the SPI interface pins
         GPIO.setup(self.spi_clk, GPIO.OUT)
         GPIO.setup(self.spi_miso, GPIO.IN)
         GPIO.setup(self.spi_mosi, GPIO.OUT)
         GPIO.setup(self.spi_cs, GPIO.OUT)
 
-    def poll(self):
+    def poll(self) -> np.ndarray:
         """Poll the current ADC values"""
         pin_vals = np.zeros(self.N_ANALOG)
         for pin in range(self.N_ANALOG):

@@ -2,6 +2,8 @@
 """
 Display text on an OLED screen.
 """
+from typing import Mapping, List
+
 import click
 import logging
 from random import randrange
@@ -177,7 +179,7 @@ class OLEDDisplay(object):
                     draw.rectangle((x, y, x + size, y + size), fill=shade)
 
 
-def display_factory(config):
+def display_factory(config: Mapping) -> List[OLEDDisplay]:
     displays = []
     for c in config:
         display_type = c.pop('type')
