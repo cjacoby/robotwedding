@@ -97,27 +97,22 @@ driver_modes = {
 
 
 @click.command()
-@click.argument('server_mode', type=click.Choice(driver_modes.keys()))
+@click.argument('server_mode', type=click.Choice(driver_modes.keys()),
+                default='run')
 @click.option('-c', '--config', type=click.Path(exists=True),
               default=DEFAULT_CONFIG)
 @click.option('-v', '--verbose', count=True)
 def run_robot(server_mode: str, config: str, verbose: int) -> None:
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     robot_config = anyconfig.load(config, ac_parser="yaml")
-    driver = robot_driver.RobotDriver(robot_config)
-
-    driver.setup()
 
     mode_fn = driver_modes[server_mode]
-
     if not mode_fn:
         print(f'No driver configured for specified mode: {server_mode}')
-        driver.cleanup()
         return
 
-    mode_fn(driver)
-
-    driver.cleanup()
+    with robot_driver.RobotDriver(robot_config) as driver:
+        mode_fn(driver)
 
 
 if __name__ == "__main__":

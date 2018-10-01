@@ -5,7 +5,8 @@ import logging
 import numpy as np
 import pathlib
 import time
-from typing import Optional, Mapping, List
+from typing import Optional, Mapping, List, Type
+from types import TracebackType
 
 try:
     import RPi.GPIO as GPIO
@@ -37,13 +38,15 @@ class RobotDriver:
     N_KNOBS = 4
 
     def __init__(self, config: Mapping) -> None:
+        self.config = config
+
         self.buttons = buttons.multi_button_factory(
-            config.get('buttons', []))
+            self.config.get('buttons', []))
         self.leds = [x.led for x in self.buttons
                      if isinstance(x, buttons.LEDPushButton)]
         # self.leds = [False for i in range(self.N_LEDS)]
-        self.servos = servos.servo_factory(config.get('servos', []))
-        self.knobs_stats = []
+        self.servos = servos.servo_factory(self.config.get('servos', []))
+        self.knobs_state = []
 
         def toggle_leds() -> None:
             self.toggle_all_leds()
@@ -69,9 +72,19 @@ class RobotDriver:
         self.adc.set_callbacks(callbacks)
 
         self.displays = robot_display.display_factory(
-            config.get('display'))
+            self.config.get('display'))
 
         self.sound = robot_sound.SoundResource()
+
+    def __enter__(self) -> 'RobotDriver':
+        self.setup()
+        return self
+
+    def __exit__(self,
+                 exc_type: Optional[Type[BaseException]] = None,
+                 value: Optional[BaseException] = None,
+                 traceback: Optional[TracebackType] = None) -> Optional[bool]:
+        self.cleanup()
 
     def __repr__(self) -> str:
         return (f"{self.__class__.__name__}("
@@ -141,114 +154,5 @@ class RobotDriver:
             d.setup()
         self.sound.setup()
 
-    def run(self) -> None:
-        logger.info("Running Driver Server")
-        runner = robot_runners.RobotStateMachineRunner(self)
-        try:
-            runner.run()
-        except KeyboardInterrupt:
-            logger.info("Stopping Driver (user cancelled)")
-
-    def run_http_server(self) -> None:
-        http_serve.run_server(self)
-
-    def run_test_mode(self) -> None:
-        logger.info("Starting Run Loop")
-
-        runner = robot_runners.TestModeRunner(self)
-        runner.run()
-
-    def run_async_test(self) -> None:
-        logger.info("Starting Run Loop")
-
-        runner = robot_runners.TestAsyncRunner(self)
-        runner.run()
-
-    def run_led_test(self) -> None:
-        # Boostrap test
-        while True:
-            time.sleep(0.5)
-            self.toggle_all_leds()
-
-    def run_text_test(self) -> None:
-        display = self.display
-        if not display:
-            print('No display configured.')
-            return
-
-        try:
-            while True:
-                text = click.prompt("Text to display (q to quit)")
-                if text != 'q':
-                    display.draw_text(text)
-                else:
-                    break
-
-        except KeyboardInterrupt:
-            pass
-
-    def run_servo_test(self) -> None:
-        logger.info("Servo Test")
-        for s in self.servos:
-            s.set_position_norm(0.0)
-            time.sleep(0.5)
-            s.set_position_norm(1.0)
-            time.sleep(0.5)
-            s.set_position_norm(0.0)
-
-    def run_sound_test(self) -> None:
-        logger.info("Running sound test")
-        robot_sound.run_test()
-
-    def run_display_test(self) -> None:
-        logger.info("Running display test")
-        robot_display.run_test()
-
     def cleanup(self) -> None:
         GPIO.cleanup()
-
-
-driver_modes = {
-    'osc': None,
-    'http': 'run_http_server',
-    'run': 'run',
-    'ledtest': 'run_led_test',
-    'screentest': 'run_display_test',
-    'soundtest': 'run_sound_test',
-    'drawtext': 'run_text_test',
-    'servotest': 'run_servo_test',
-    'test': 'run_test_mode',
-    'asynctest': 'run_async_test'
-}
-
-
-@click.command()
-@click.argument('server_mode', type=click.Choice(driver_modes.keys()))
-@click.option('-c', '--config', type=click.Path(exists=True),
-              default=default_config)
-@click.option('-v', '--verbose', count=True)
-def run_robot(server_mode: str, config: str, verbose: int) -> None:
-    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
-    robot_config = anyconfig.load(config, ac_parser="yaml")
-    driver = RobotDriver(robot_config)
-    driver.setup()
-
-    driver_mode = driver_modes[server_mode]
-
-    if not driver_mode:
-        print(f'No driver configured for specified mode: {server_mode}')
-        driver.cleanup()
-        return
-
-    run_fn = getattr(driver, driver_mode)
-    if not run_fn:
-        driver.cleanup()
-        raise ValueError(f'No method written for {driver_mode}')
-
-    run_fn()
-
-    driver.cleanup()
-
-
-if __name__ == "__main__":
-    run_robot()
