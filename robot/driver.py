@@ -126,8 +126,10 @@ class RobotDriver:
 
     @property
     def display(self) -> Optional[robot_display.OLEDDisplay]:
-        if self.displays:
-            return self.displays[0]
+        if not self.displays:
+            return None
+
+        return self.displays[0]
 
     def setup(self) -> None:
         for b in self.buttons:
