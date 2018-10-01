@@ -1,9 +1,13 @@
 import asyncio
 import enum
 import logging
+import random
 import time
 import numpy as np
+from typing import Callable
 from queue import Queue
+
+import robot.actions
 
 logger = logging.getLogger(__name__)
 
@@ -117,22 +121,14 @@ class TestAsyncRunner(object):
         await asyncio.sleep(self.display_poll)
 
 
-@enum.unique
-class RobotStates(enum.Enum):
-    DEFAULT = 0
-    BEEP_BOOP = 1
-    WHIMSICAL_TASKS = 2
-    POLL_QA = 3
-    RANDOM_FACTOIDS = 4
-
-
-class RobotStateMachineRunner(object):
+class RobotScriptRunner(object):
     """Class which manages the main event loop of the 'real' robot mode.
     """
     def __init__(self, driver):
         self.driver = driver
-        self.current_state = RobotStates.DEFAULT
-        self.state_change_event = asyncio.Event()
+
+    def _get_random_action(self) -> Callable:
+        return random.choice(list(robot.actions.registry.values()))
 
     def run(self):
         logger.info("Beggining State Machine")
@@ -140,8 +136,7 @@ class RobotStateMachineRunner(object):
             loop = asyncio.get_event_loop()
 
             tasks = [
-                asyncio.ensure_future(self.run_state_machine_controller()),
-                asyncio.ensure_future(self.random_state_changes())
+                asyncio.ensure_future(self.run_action_loop()),
             ]
 
             loop.run_until_complete(asyncio.wait(tasks))
@@ -151,23 +146,9 @@ class RobotStateMachineRunner(object):
             loop.close()
         logger.info("Async event loop complete")
 
-    async def run_state_machine_controller(self):
+    async def run_action_loop(self):
         while True:
-            logger.info("Back to sleep")
-            await self.state_change_event.wait()
-            logger.info(f"State change! {self.current_state}")
-            self.state_change_event.clear()
-
-    async def random_state_changes(self):
-        while True:
-            # Wait some random number of seconds
-            sleep_time = np.random.random() + 3
-            logger.info(f"State change sleep time: {sleep_time}")
-            await asyncio.sleep(sleep_time)
-
-            # Set a new state
-            self.current_state = np.random.randint(5)
-
-            logger.info(f"Set: {self.current_state}")
-            self.state_change_event.set()
-            logger.info(f"Set: {self.current_state}")
+            logger.info("Running a new action")
+            action = self._get_random_action()(self.driver)
+            logger.info(f"Action chosen: {action}")
+            await action.run()

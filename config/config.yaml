@@ -2,15 +2,19 @@ buttons:
   - type: led_push_button
     switch_pin: 17
     led_pin: 4
+    label: yellow
   - type: led_push_button
     switch_pin: 27
     led_pin: 18
+    label: green
   - type: led_push_button
     switch_pin: 23
     led_pin: 22
+    label: red
   - type: led_push_button
     switch_pin: 25
     led_pin: 24
+    label: blue
 
 servos:
   - type: continuous
@@ -30,3 +34,5 @@ servos:
 display:
   - type: oled
     echo_result: true
+
+

@@ -48,6 +48,18 @@ class SoundResource(object):
 
         self.play_file(output_path)
 
+    async def aplay_speech(self, text):
+        if text in self.speech_map:
+            output_path = self.speech_map[hash(text)]
+        else:
+            filename = f"{str(uuid.uuid4()).replace('-', '')}.wav"
+            output_path = pathlib.Path(self.speech_dir.name) / filename
+
+            speech_to_wav(text, output_path)
+            self.speech_map[hash(text)] = output_path
+
+        await self.aplay_file(output_path)
+
     def play_init_sound(self):
         # if wav_files[0].exists():
             # pygame.mixer.music.load(str(wav_files[0]))
@@ -61,7 +73,7 @@ class SoundResource(object):
         self.play_file(wav_files[0])
 
     async def aplay_init_sound(self):
-        await self.play_file(wav_files[0])
+        await self.aplay_file(wav_files[0])
 
     def play_file(self, path):
         if path.exists():

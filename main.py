@@ -20,14 +20,16 @@ DEFAULT_CONFIG = (pathlib.Path(__file__).parent.parent / "config" /
 
 def run(driver: robot_driver.RobotDriver) -> None:
     logger.info("Running Driver Server")
-    runner = robot_runners.RobotStateMachineRunner(driver)
+    runner = robot_runners.RobotScriptRunner(driver)
     try:
         runner.run()
     except KeyboardInterrupt:
         logger.info("Stopping Driver (user cancelled)")
 
+
 def run_http_server(driver: robot_driver.RobotDriver) -> None:
     http_serve.run_server(driver)
+
 
 def run_test_mode(driver: robot_driver.RobotDriver) -> None:
     logger.info("Starting Run Loop")
@@ -35,17 +37,20 @@ def run_test_mode(driver: robot_driver.RobotDriver) -> None:
     runner = robot_runners.TestModeRunner(driver)
     runner.run()
 
+
 def run_async_test(driver: robot_driver.RobotDriver) -> None:
     logger.info("Starting Run Loop")
 
     runner = robot_runners.TestAsyncRunner(driver)
     runner.run()
 
+
 def run_led_test(driver: robot_driver.RobotDriver) -> None:
     # Boostrap test
     while True:
         time.sleep(0.5)
         driver.toggle_all_leds()
+
 
 def run_text_test(driver: robot_driver.RobotDriver) -> None:
     display = driver.display
@@ -64,6 +69,7 @@ def run_text_test(driver: robot_driver.RobotDriver) -> None:
     except KeyboardInterrupt:
         pass
 
+
 def run_servo_test(driver: robot_driver.RobotDriver) -> None:
     logger.info("Servo Test")
     for s in driver.servos:
@@ -73,9 +79,11 @@ def run_servo_test(driver: robot_driver.RobotDriver) -> None:
         time.sleep(0.5)
         s.set_position_norm(0.0)
 
+
 def run_sound_test(driver: robot_driver.RobotDriver) -> None:
     logger.info("Running sound test")
     robot_sound.run_test()
+
 
 def run_display_test(driver: robot_driver.RobotDriver) -> None:
     logger.info("Running display test")

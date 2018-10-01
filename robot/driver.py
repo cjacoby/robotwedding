@@ -48,25 +48,20 @@ class RobotDriver:
         self.servos = servos.servo_factory(self.config.get('servos', []))
         self.knobs_state = []
 
-        def toggle_leds() -> None:
-            self.toggle_all_leds()
-            time.sleep(1)
-            self.toggle_all_leds()
-
         callbacks = [
+            # # robot_adc.LambdaCallback(
+            # #     lambda val: self.set_servo_position(0, val / 1024),
+            # #     selected_pin=0),
             # robot_adc.LambdaCallback(
-            #     lambda val: self.set_servo_position(0, val / 1024),
-            #     selected_pin=0),
-            robot_adc.LambdaCallback(
-                lambda val: self.set_servo_position(1, val / 1024),
-                selected_pin=1),
-            robot_adc.LambdaCallback(
-                lambda val: self.set_servo_position(2, val / 1024),
-                selected_pin=2),
-            robot_adc.LambdaCallback(
-                lambda val: self.set_servo_position(3, val / 1024),
-                selected_pin=3),
-            # robot_adc.ButtonCallbackLambda(4, toggle_leds)
+            #     lambda val: self.set_servo_position(1, val / 1024),
+            #     selected_pin=1),
+            # robot_adc.LambdaCallback(
+            #     lambda val: self.set_servo_position(2, val / 1024),
+            #     selected_pin=2),
+            # robot_adc.LambdaCallback(
+            #     lambda val: self.set_servo_position(3, val / 1024),
+            #     selected_pin=3),
+            # # robot_adc.ButtonCallbackLambda(4, toggle_leds)
         ]
         self.adc = robot_adc.ADCPoller()
         self.adc.set_callbacks(callbacks)
