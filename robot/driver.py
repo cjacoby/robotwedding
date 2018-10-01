@@ -233,11 +233,17 @@ def run_robot(server_mode: str, config: str, verbose: int) -> None:
 
     driver_mode = driver_modes[server_mode]
 
-    if driver_mode:
-        run_fn = getattr(driver, driver_mode)
+    if not driver_mode:
+        print(f'No driver configured for specified mode: {server_mode}')
+        driver.cleanup()
+        return
 
-        if run_fn:
-            run_fn()
+    run_fn = getattr(driver, driver_mode)
+    if not run_fn:
+        driver.cleanup()
+        raise ValueError(f'No method written for {driver_mode}')
+
+    run_fn()
 
     driver.cleanup()
 
