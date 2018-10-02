@@ -124,8 +124,9 @@ class TestAsyncRunner(object):
 class RobotScriptRunner(object):
     """Class which manages the main event loop of the 'real' robot mode.
     """
-    def __init__(self, driver):
+    def __init__(self, driver, adc_poll_interval=0.05):
         self.driver = driver
+        self.adc_poll_interval = adc_poll_interval
 
     def _get_random_action(self) -> Callable:
         return random.choice(list(robot.actions.registry.values()))
@@ -136,6 +137,7 @@ class RobotScriptRunner(object):
             loop = asyncio.get_event_loop()
 
             tasks = [
+                asyncio.ensure_future(self.poll_adc()),
                 asyncio.ensure_future(self.run_action_loop()),
             ]
 
@@ -144,11 +146,21 @@ class RobotScriptRunner(object):
         finally:
             loop.run_until_complete(loop.shutdown_asyncgens())
             loop.close()
-        logger.info("Async event loop complete")
+        logger.info("Async event loopf complete")
+
+    async def poll_adc(self):
+        while True:
+            logger.debug("Polling Sensors")
+            adc_values = self.driver.read_adc_with_buttons()
+            adc_values = adc_values / 1024
+            await asyncio.sleep(self.adc_poll_interval)
 
     async def run_action_loop(self):
         while True:
             logger.info("Running a new action")
             action = self._get_random_action()(self.driver)
             logger.info(f"Action chosen: {action}")
-            await action.run()
+
+            # Activates the callbacks
+            with action:
+                await action.run()

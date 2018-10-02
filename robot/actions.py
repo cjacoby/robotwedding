@@ -22,6 +22,22 @@ class Action(abc.ABC):
 
         registry[cls.__name__] = cls
 
+    def __enter__(self):
+        "register the subclass's callbacks, if available, to the driver"
+        if hasattr(self, 'button_callback'):
+            self.driver.register_button_callback(self.button_callback)
+
+        if hasattr(self, 'knob_callback'):
+            self.driver.register_knob_callback(self.knob_callback)
+
+        return self
+
+    def __exit__(self, *exec):
+        "deregister callbacks"
+        logger.debug(f"Degregistering {self}'s callbacks")
+        self.driver.deregister_callbacks()
+        return False
+
 
 class BasicTest(Action):
     async def run(self):
@@ -34,7 +50,7 @@ class ActionPlayTwoSounds(Action):
         pass
 
     def knob_callback(self, knob):
-        pass
+        print("Knob callback:", knob)
 
     async def run(self):
         await self.driver.sound.aplay_init_sound()
@@ -43,3 +59,11 @@ class ActionPlayTwoSounds(Action):
         await self.driver.sound.aplay_sin(freq=1000, dur=1)
 
         await self.driver.sound.aplay_init_sound()
+
+
+class ActionPrintKnobCallback(Action):
+    def knob_callback(self, knob):
+        print("Knob callback:", knob)
+
+    async def run(self):
+        await asyncio.sleep(1)

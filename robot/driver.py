@@ -46,25 +46,11 @@ class RobotDriver:
                      if isinstance(x, buttons.LEDPushButton)]
         # self.leds = [False for i in range(self.N_LEDS)]
         self.servos = servos.servo_factory(self.config.get('servos', []))
-        self.knobs_state = []
 
-        callbacks = [
-            # # robot_adc.LambdaCallback(
-            # #     lambda val: self.set_servo_position(0, val / 1024),
-            # #     selected_pin=0),
-            # robot_adc.LambdaCallback(
-            #     lambda val: self.set_servo_position(1, val / 1024),
-            #     selected_pin=1),
-            # robot_adc.LambdaCallback(
-            #     lambda val: self.set_servo_position(2, val / 1024),
-            #     selected_pin=2),
-            # robot_adc.LambdaCallback(
-            #     lambda val: self.set_servo_position(3, val / 1024),
-            #     selected_pin=3),
-            # # robot_adc.ButtonCallbackLambda(4, toggle_leds)
-        ]
-        self.adc = robot_adc.ADCPoller()
-        self.adc.set_callbacks(callbacks)
+        self.adc = robot_adc.ADCPoller(**self.config.get('adc'))
+
+        # Clear/reset the callbacks
+        self.deregister_callbacks()
 
         self.displays = robot_display.display_factory(
             self.config.get('display'))
@@ -87,6 +73,16 @@ class RobotDriver:
                 f"n_leds={self.get_n_leds()},"
                 f"n_servos={len(self.servos)})")
 
+    def register_button_callback(self, callback):
+        self.adc.set_button_callback(callback)
+        # TODO button callbacks need to handle two kinds of buttons
+
+    def register_knob_callback(self, callback):
+        self.adc.set_knob_callback(callback)
+
+    def deregister_callbacks(self):
+        self.adc.clear_callbacks()
+
     def get_n_leds(self) -> int:
         return len(self.leds)
 
@@ -100,13 +96,6 @@ class RobotDriver:
     def toggle_all_leds(self) -> None:
         for b in self.leds:
             b.toggle_led()
-
-    def get_knob_state(self, index: int) -> int:
-        return self.knobs_state[index]
-
-    def set_knob_state(self, index: int, value: int) -> int:
-        self.knobs_state[index] = value
-        return value
 
     def trigger_button_cb(self, index: int) -> None:
         logger.info(f"Trigger button {index} callback.")

@@ -6,7 +6,7 @@ except ImportError:
     import robot.dummyGPIO as GPIO
 
 from collections import defaultdict
-from typing import Callable, Collection, Optional, Sequence
+from typing import Callable, Collection, Mapping, Optional, Sequence
 import logging
 import numpy as np
 
@@ -49,75 +49,14 @@ def read_adc_spi_pin(adc_idx, clockpin, mosipin, misopin, cspin):
     return adcout
 
 
-class ADCCallback(object):
-    def on_poll(self, pin_vals):
-        raise NotImplementedError()
+class ADCKnob(object):
+    def __init__(self, pin_index, value, parent):
+        self.pin = pin_index
+        self.value = value
+        self.parent = parent
 
-    def on_pin_changed(self, pin_vals):
-        raise NotImplementedError()
-
-    def on_rise(self, pin_vals, pin_changed):
-        raise NotImplementedError()
-
-
-class LambdaCallback(ADCCallback):
-    def __init__(self, poll_lam=None, selected_pin=None):
-        self.poll_lam = poll_lam
-        self.selected_pin = selected_pin
-
-    def on_poll(self, pin_vals):
-        if self.poll_lam is not None:
-            value = (pin_vals[self.selected_pin] if self.selected_pin
-                     else pin_vals)
-            self.poll_lam(value)
-
-
-class ButtonCallback(ADCCallback):
-    """Trigger on_rise when the threshold changes."""
-    def __init__(self, selected_pin, on_threshold=900):
-        self.selected_pin = selected_pin
-        self.on_threshold = on_threshold
-
-    def on_rise(self):
-        """Triggered when the callback is executed."""
-        raise NotImplementedError()
-
-
-class ButtonCallbackLambda(ButtonCallback):
-    def __init__(self, selected_pin, btn_lam, on_threshold=900):
-        super(ButtonCallbackLambda, self).__init__(
-            selected_pin, on_threshold)
-        self.btn_lam = btn_lam
-
-    def on_rise(self):
-        self.btn_lam()
-
-
-class ADCCallbackList(object):
-    """Container abstracting a list of callbacks."""
-    def __init__(self, callbacks=None):
-        callbacks = callbacks or []
-        self.callbacks = [c for c in callbacks]
-
-    def append(self, callback):
-        self.callbacks.append(callback)
-
-    def __iter__(self):
-        return iter(self.callbacks)
-
-    def on_poll(self, pin_vals):
-        logger.debug(f"on_poll() : {pin_vals}")
-        for callback in self.callbacks:
-            callback.on_poll(pin_vals)
-
-    def on_rise(self, pin_vals, pin_changed):
-        for callback in self.callbacks:
-            if (hasattr(callback, 'selected_pin') and
-                    hasattr(callback, 'on_threshold')):
-                pin_index = callback.selected_pin
-                if (pin_vals[pin_index] > callback.on_threshold and
-                        self.pin_changed):
-                    callback.on_rise()
+    def __repr__(self):
+        return f"{self.__class__.__name__}(pin={self.pin})"
 
 
 class ADCPoller(object):
@@ -132,7 +71,7 @@ class ADCPoller(object):
                  spi_miso: int = 19,
                  spi_mosi: int = 20,
                  spi_cs: int = 21,
-                 callbacks: Optional[Collection[ADCCallback]] = None) -> None:
+                 callback_defs: Optional[Mapping[str, str]] = None) -> None:
         self.spi_clk = spi_clk
         self.spi_miso = spi_miso
         self.spi_mosi = spi_mosi
@@ -141,12 +80,19 @@ class ADCPoller(object):
         self.last_read = np.zeros(self.N_ANALOG)
         self.pin_changed = np.zeros(self.N_ANALOG, dtype=bool)
         self.change_tolerance = 5
-        self.set_callbacks(callbacks)
+        self.callback_defs = callback_defs
+        self._knob_callback = None
+        self._button_callback = None
 
-    def set_callbacks(self,
-                      callbacks: Optional[Collection[ADCCallback]]) -> None:
-        _callbacks = callbacks or []
-        self.callbacks = ADCCallbackList(_callbacks)
+    def set_knob_callback(self, callback: Callable):
+        self._knob_callback = callback
+
+    def set_button_callback(self, callback: Callable):
+        self._button_callback = callback
+
+    def clear_callbacks(self):
+        self._knob_callback = None
+        self._button_callback = None
 
     def setup(self) -> None:
         # set up the SPI interface pins
@@ -162,12 +108,23 @@ class ADCPoller(object):
             pin_vals[pin] = read_adc_spi_pin(pin, self.spi_clk,
                                              self.spi_mosi, self.spi_miso,
                                              self.spi_cs)
-        self.callbacks.on_poll(pin_vals)
+
+        for cb_def in self.callback_defs:
+            pin = cb_def.get('apin', -1)
+            cb_type = cb_def.get('type', 'knob')
+            if 0 <= pin < 8:
+                if cb_type == 'knob' and self._knob_callback:
+                    self._knob_callback(self.pin_as_knob(pin))
+                elif cb_type == 'button' and self._button_callback:
+                    self._button_callback(self.pin_as_button(pin))
 
         pin_diff = np.abs(pin_vals - self.last_read)
         self.pin_changed = pin_diff > self.change_tolerance
-
-        self.callbacks.on_rise(pin_vals, self.pin_changed)
-
         self.last_read = pin_vals
         return pin_vals
+
+    def pin_as_button(self, pin_index):
+        return None
+
+    def pin_as_knob(self, pin_index):
+        return ADCKnob(pin_index, self.last_read[pin_index], self)
