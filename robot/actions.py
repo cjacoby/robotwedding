@@ -40,6 +40,12 @@ class Action(abc.ABC):
 
 
 class MainLoop(Action):
+    def button_callback(self, button):
+        logger.info("Button Callback", button)
+
+    def knob_callback(self, knob):
+        logger.info("Knob callback", knob)
+
     async def run(self):
         logger.info("MainLoop")
         self.driver.display.draw_text("Hello! Main loop.")
