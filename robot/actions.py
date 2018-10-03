@@ -24,17 +24,20 @@ class Action(abc.ABC):
 
     def __enter__(self):
         "register the subclass's callbacks, if available, to the driver"
+        logger.info(f"__enter__")
         if hasattr(self, 'button_callback'):
+            logger.info(f"__enter__ {self.button_callback}")
             self.driver.register_button_callback(self.button_callback)
 
         if hasattr(self, 'knob_callback'):
+            logger.info(f"__enter__ {self.knob_callback}")
             self.driver.register_knob_callback(self.knob_callback)
 
         return self
 
     def __exit__(self, *exec):
         "deregister callbacks"
-        logger.debug(f"Degregistering {self}'s callbacks")
+        logger.info(f"Degregistering {self}'s callbacks")
         self.driver.deregister_callbacks()
         return False
 
