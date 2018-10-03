@@ -152,7 +152,8 @@ class RobotScriptRunner(object):
         while True:
             logger.debug("Polling Sensors")
             adc_values = self.driver.read_adc_with_buttons()
-            adc_values = adc_values / 1024
+            logger.info(f"ADC Values: {adc_values}")
+            # adc_values = adc_values / 1024
             await asyncio.sleep(self.adc_poll_interval)
 
     async def run_action_loop(self):
