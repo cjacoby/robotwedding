@@ -61,6 +61,7 @@ class MainLoop(Action):
         await self.driver.sound.aplay_speech(
             "Welcome to Christopher and Zo ell's wedding")
         while total_sleep < self.sleep_time:
+            logger.info(f"Next loop - {total_sleep}, {self.next_state}")
             if self.next_state is not None:
                 self.driver.display.draw_text(f"Pushed {self.next_state}")
                 await self.driver.sound.aplay_speech(f"You pushed {self.next_state}")
