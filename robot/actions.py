@@ -40,17 +40,32 @@ class Action(abc.ABC):
 
 
 class MainLoop(Action):
+    def __init__(self, driver, sleep_time=15):
+        super(MainLoop, self).__init__(driver)
+        self.next_state = None
+        self.sleep_time = 30
+
     def button_callback(self, button):
         logger.info(f"Button Callback {button}")
+        if button is not None and hasattr(button, 'label'):
+            next_state = button.label
 
     def knob_callback(self, knob):
         logger.debug(f"Knob callback {knob}")
 
     async def run(self):
+        total_sleep = 0
         logger.info("MainLoop")
         self.driver.display.draw_text("Hello! Main loop.")
-        await self.driver.sound.aplay_speech("I am robot.")
-        await asyncio.sleep(10)
+        await self.driver.sound.aplay_speech("Hello.")
+        await self.driver.sound.aplay_speech(
+            "Welcome to Christopher and Zo ell's wedding")
+        while total_sleep < self.sleep_time:
+            if self.next_state is not None:
+                self.driver.display.draw_text(f"Pushed {self.next_state}")
+                await self.driver.sound.aplay_speech(f"You pushed {self.next_state}")
+            await asyncio.sleep(1)
+            total_sleep += 1
         self.driver.display.clear()
 
 

@@ -102,6 +102,10 @@ class RobotDriver:
         for b in self.leds:
             b.toggle_led()
 
+    def clear_all_leds(self) -> None:
+        for b in self.leds:
+            b.set_state(False)
+
     def trigger_button_cb(self, index: int) -> None:
         logger.info(f"Trigger button {index} callback.")
 
