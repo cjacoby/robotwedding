@@ -83,6 +83,11 @@ class OLEDDisplay(object):
                    gpio_RST=settings['gpio_reset'],
                    gpio=None)
 
+    def clear(self):
+        logger.debug("Display clear")
+        if self.device is not None:
+            self.device.clear()
+
     def draw_text(self, text):
         logger.debug(f"Drawing: '{text}'")
 

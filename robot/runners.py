@@ -162,9 +162,9 @@ class RobotScriptRunner(object):
         while True:
             if len(action_queue) == 0:
                 logger.info("No actions found; getting a random one.")
-                action_queue.append(self._get_random_action()(self.driver))
+                action_queue.append(self._get_random_action())
 
-            action = action_queue.pop(0)
+            action = action_queue.pop(0)(self.driver)
             logger.info(f"Action chosen: {action}")
             logger.info(f"Remaining Actions: {len(action_queue)}")
 
