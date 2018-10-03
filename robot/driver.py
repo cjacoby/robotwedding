@@ -75,10 +75,15 @@ class RobotDriver:
 
     def register_button_callback(self, callback):
         self.adc.set_button_callback(callback)
-        # TODO button callbacks need to handle two kinds of buttons
+
+        for button in self.buttons:
+            button.register_callback(callback)
 
     def register_knob_callback(self, callback):
         self.adc.set_knob_callback(callback)
+
+        for button in self.buttons:
+            button.clear_callback()
 
     def deregister_callbacks(self):
         self.adc.clear_callbacks()

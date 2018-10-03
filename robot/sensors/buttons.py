@@ -13,9 +13,19 @@ logger = logging.getLogger(__name__)
 
 
 class Button:
+    def __init__(self):
+        self.callback = None
+        self.label = "Button"
+
     "Parent class for buttons"
     def setup(self):
         pass
+
+    def register_callback(self, cb):
+        self.callback = cb
+
+    def clear_callback(self):
+        self.callback = None
 
 
 class GPIOButton(Button):
@@ -23,6 +33,8 @@ class GPIOButton(Button):
     def __init__(self, pin, pull_up_down=GPIO.PUD_UP, **kwargs):
         self.pin = pin
         self.pud = pull_up_down
+        self.callback = None
+        self.label = kwargs.get('label', f'Button{self.pin}')
 
     def setup(self):
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=self.pud)
@@ -30,9 +42,13 @@ class GPIOButton(Button):
         GPIO.add_event_detect(
             self.pin, GPIO.RISING,
             callback=partial(button_callback,
+                             button=self,
                              led=(self.led if hasattr(self, 'led')
                                   else None)),
             bouncetime=220)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(label={self.label}, pin={self.pin})"
 
 
 class LEDPushButton(GPIOButton):
@@ -80,7 +96,9 @@ def multi_button_factory(button_defs):
     return [button_factory(x) for x in button_defs]
 
 
-def button_callback(button_index, led):
-    logger.info(f"Button callback {button_index}")
+def button_callback(button_index, button=None, led=None):
+    logger.info(f"Button callback {button_index} {button} {led}")
 
     led.toggle_led()
+    if button.callback is not None:
+        button.callback(button)
