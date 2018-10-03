@@ -44,7 +44,7 @@ class MainLoop(Action):
         logger.info(f"Button Callback {button}")
 
     def knob_callback(self, knob):
-        logger.info(f"Knob callback {knob}")
+        logger.debug(f"Knob callback {knob}")
 
     async def run(self):
         logger.info("MainLoop")
@@ -79,10 +79,10 @@ class BasicTest(Action):
 
 class ActionPlayTwoSounds(Action):
     def button_callback(self, button):
-        pass
+        logger.debug("ActionPlayTwoSounds Button callback:", knob)
 
     def knob_callback(self, knob):
-        print("Knob callback:", knob)
+        logger.debug("Knob callback:", knob)
 
     async def run(self):
         await self.driver.sound.aplay_init_sound()
@@ -95,7 +95,7 @@ class ActionPlayTwoSounds(Action):
 
 class ActionPrintKnobCallback(Action):
     def knob_callback(self, knob):
-        print("Knob callback:", knob)
+        logger.debug("Knob callback:", knob)
 
     async def run(self):
         await asyncio.sleep(1)

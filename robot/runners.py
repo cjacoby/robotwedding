@@ -128,10 +128,13 @@ class RobotScriptRunner(object):
         self.driver = driver
         self.adc_poll_interval = adc_poll_interval
 
-    def _get_random_action(self) -> Callable:
+    def _get_main_loop(self) -> robot.actions.Action:
+        return robot.actions.MainLoop
+
+    def _get_random_action(self) -> robot.actions.Action:
         return random.choice(list(robot.actions.registry.values()))
 
-    def run(self):
+    def run(self) -> None:
         logger.info("Beggining State Machine")
         try:
             loop = asyncio.get_event_loop()
@@ -148,22 +151,26 @@ class RobotScriptRunner(object):
             loop.close()
         logger.info("Async event loopf complete")
 
-    async def poll_adc(self):
+    async def poll_adc(self) -> None:
         while True:
             logger.debug("Polling Sensors")
             adc_values = self.driver.read_adc_with_buttons()
-            logger.info(f"ADC Values: {adc_values}")
+            logger.debug(f"ADC Values: {adc_values}")
             # adc_values = adc_values / 1024
             await asyncio.sleep(self.adc_poll_interval)
 
-    async def run_action_loop(self):
+    async def run_action_loop(self) -> None:
         logger.info("Beginning action loop")
         action_queue = []
 
         while True:
             if len(action_queue) == 0:
-                logger.info("No actions found; getting a random one.")
-                action_queue.append(self._get_random_action())
+                if random.random() < .4:
+                    logger.info("Going to main loop")
+                    action_queue.append(self._get_main_loop())
+                else:
+                    logger.info("Choosing random action")
+                    action_queue.append(self._get_random_action())
 
             action = action_queue.pop(0)(self.driver)
             logger.info(f"Action chosen: {action}")
