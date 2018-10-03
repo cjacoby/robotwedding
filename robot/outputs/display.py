@@ -128,7 +128,9 @@ class OLEDDisplay(object):
                                width=self.device.width,
                                height=self._settings['height'])
             with canvas(virtual) as draw:
-                draw.rectangle([(0, 0), (self.device.width, self.device.height)], fill=f"rgb({r},{g},{b})")
+                draw.rectangle([
+                    (0, 0), (self.device.width, self.device.height)],
+                    fill=f"rgb({int(r)},{int(g)},{int(b)})")
 
     def move_and_draw_strs(self):
         def init_stars(num_stars, max_depth):
