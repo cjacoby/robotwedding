@@ -156,11 +156,23 @@ class RobotScriptRunner(object):
             await asyncio.sleep(self.adc_poll_interval)
 
     async def run_action_loop(self):
+        logger.info("Beginning action loop")
+        action_queue = []
+
         while True:
-            logger.info("Running a new action")
-            action = self._get_random_action()(self.driver)
+            if len(action_queue) == 0:
+                logger.info("No actions found; getting a random one.")
+                action_queue.append(self._get_random_action()(self.driver))
+
+            action = action_queue.pop(0)
             logger.info(f"Action chosen: {action}")
+            logger.info(f"Remaining Actions: {len(action_queue)}")
 
             # Activates the callbacks
             with action:
-                await action.run()
+                new_actions = await action.run()
+
+                if new_actions is not None and isinstance(new_actions, list):
+                    action_queue.extend(new_actions)
+                elif new_actions is not None:
+                    action_queue.append(new_actions)

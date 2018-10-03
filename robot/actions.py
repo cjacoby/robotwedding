@@ -39,6 +39,19 @@ class Action(abc.ABC):
         return False
 
 
+class FlashStuff(Action):
+    async def run(self):
+        logger.info("FlashStuff")
+        self.driver.display.draw_text("beep beep!")
+        await asyncio.sleep(0.5)
+        for i in range(6):
+            self.driver.toggle_all_leds()
+            self.driver.display.fill_rgb(255 * (i / 6), 0, 0)
+            await asyncio.sleep(0.25)
+            self.driver.toggle_all_leds()
+            await asyncio.sleep(0.25)
+
+
 class BasicTest(Action):
     async def run(self):
         logger.info("action_test - wait")
