@@ -51,6 +51,7 @@ class MainLoop(Action):
         self.driver.display.draw_text("Hello! Main loop.")
         await self.driver.sound.aplay_speech("I am robot.")
         await asyncio.sleep(10)
+        self.driver.display.clear()
 
 
 class FlashStuff(Action):
@@ -65,8 +66,9 @@ class FlashStuff(Action):
             await asyncio.sleep(0.25)
             self.driver.toggle_all_leds()
             await asyncio.sleep(0.25)
+        self.driver.display.clear()
 
-        return 
+        return MainLoop
 
 
 class BasicTest(Action):
