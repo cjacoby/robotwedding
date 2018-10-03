@@ -56,7 +56,7 @@ class ADCKnob(object):
         self.parent = parent
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(pin={self.pin}, value={self.value})"
+        return f"{self.__class__.__name__}(pin={self.pin}, value={self.value}, values={self.parent.last_read})"
 
 
 class ADCPoller(object):
