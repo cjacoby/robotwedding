@@ -45,6 +45,7 @@ class FlashStuff(Action):
         self.driver.display.draw_text("beep beep!")
         await asyncio.sleep(0.5)
         for i in range(6):
+            logger.info(f"FlashStuff - {i}")
             self.driver.toggle_all_leds()
             self.driver.display.fill_rgb(255 * (i / 6), 0, 0)
             await asyncio.sleep(0.25)
