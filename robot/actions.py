@@ -39,6 +39,14 @@ class Action(abc.ABC):
         return False
 
 
+class MainLoop(Action):
+    async def run(self):
+        logger.info("MainLoop")
+        self.driver.display.draw_text("Hello! Main loop.")
+        await self.driver.sound.aplay_speech("I am robot.")
+        await asyncio.sleep(10)
+
+
 class FlashStuff(Action):
     async def run(self):
         logger.info("FlashStuff")
@@ -51,6 +59,8 @@ class FlashStuff(Action):
             await asyncio.sleep(0.25)
             self.driver.toggle_all_leds()
             await asyncio.sleep(0.25)
+
+        return 
 
 
 class BasicTest(Action):
