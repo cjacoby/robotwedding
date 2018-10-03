@@ -48,7 +48,7 @@ class MainLoop(Action):
     def button_callback(self, button):
         logger.info(f"Button Callback {button}")
         if button is not None and hasattr(button, 'label'):
-            next_state = button.label
+            self.next_state = button.label
 
     def knob_callback(self, knob):
         logger.debug(f"Knob callback {knob}")
