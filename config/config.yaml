@@ -36,3 +36,17 @@ display:
     echo_result: true
 
 
+adc:
+  spi_clk: 16
+  spi_miso: 19
+  spi_mosi: 20
+  spi_cs: 21
+  callback_defs:
+    - apin: 0
+      type: knob
+    - apin: 1
+      type: knob
+    - apin: 2
+      type: knob
+    - apin: 3
+      type: knob
