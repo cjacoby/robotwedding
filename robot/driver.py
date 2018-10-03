@@ -78,15 +78,15 @@ class RobotDriver:
 
         for button in self.buttons:
             button.register_callback(callback)
+            logger.info(f"Button: {button}, {callback}, {button.callback}")
 
     def register_knob_callback(self, callback):
         self.adc.set_knob_callback(callback)
+    def deregister_callbacks(self):
+        self.adc.clear_callbacks()
 
         for button in self.buttons:
             button.clear_callback()
-
-    def deregister_callbacks(self):
-        self.adc.clear_callbacks()
 
     def get_n_leds(self) -> int:
         return len(self.leds)
@@ -105,6 +105,7 @@ class RobotDriver:
     def clear_all_leds(self) -> None:
         for b in self.leds:
             b.set_state(False)
+            logger.info(f"Clearing state {b}: {b.led_state}")
 
     def trigger_button_cb(self, index: int) -> None:
         logger.info(f"Trigger button {index} callback.")

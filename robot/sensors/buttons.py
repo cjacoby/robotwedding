@@ -97,7 +97,7 @@ def multi_button_factory(button_defs):
 
 
 def button_callback(button_index, button=None, led=None):
-    logger.info(f"Button callback {button_index} {button} {led} "
+    logger.debug(f"Button callback {button_index} {button} {led} "
                 f"{button.callback}")
 
     led.toggle_led()

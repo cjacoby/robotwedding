@@ -50,13 +50,14 @@ class MainLoop(Action):
 
     def button_callback(self, button):
         logger.info(f"Button Callback {button}")
-        if button is not None and hasattr(button, 'label'):
+        if button is not None and hasattr(button, 'label') and hasattr(button, 'led') and button.led.get_state():
             self.next_state = button.label
 
     def knob_callback(self, knob):
         logger.debug(f"Knob callback {knob}")
 
     async def run(self):
+        result = None
         total_sleep = 0
         logger.info("MainLoop")
         self.driver.display.draw_text("Hello! Main loop.")
@@ -68,9 +69,24 @@ class MainLoop(Action):
             if self.next_state is not None:
                 self.driver.display.draw_text(f"Pushed {self.next_state}")
                 await self.driver.sound.aplay_speech(f"You pushed {self.next_state}")
+                await asyncio.sleep(0.25)
+
+                if self.next_state == "red":
+                    result = FlashStuff
+                    break
+                elif self.next_state == "blue":
+                    result = ActionPlayTwoSounds
+                    break
+                else:
+                    self.driver.clear_all_leds()
+                self.next_state = None
+
             await asyncio.sleep(1)
             total_sleep += 1
+
         self.driver.display.clear()
+        self.driver.clear_all_leds()
+        return result
 
 
 class FlashStuff(Action):

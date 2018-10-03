@@ -22,10 +22,11 @@ class LED(object):
             self.led_state = False
             GPIO.output(self.led_pin, GPIO.LOW)
 
-        self.led_state = not self.led_state
-        self.set_state(self.led_state)
+        new_state = not self.led_state
+        self.set_state(new_state)
 
     def set_state(self, state: bool) -> None:
+        self.led_state = state
         GPIO.output(self.led_pin, GPIO.HIGH if self.led_state else GPIO.LOW)
         logger.debug("LED State (pin %i) : %i", self.led_pin, self.led_state)
 
