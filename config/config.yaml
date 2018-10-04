@@ -2,7 +2,7 @@ buttons:
   - type: led_push_button
     switch_pin: 17
     led_pin: 4
-    label: yellow
+    label: red
   - type: led_push_button
     switch_pin: 27
     led_pin: 18
@@ -10,11 +10,11 @@ buttons:
   - type: led_push_button
     switch_pin: 23
     led_pin: 22
-    label: red
+    label: blue
   - type: led_push_button
     switch_pin: 25
     led_pin: 24
-    label: blue
+    label: yellow
 
 servos:
   - type: continuous
