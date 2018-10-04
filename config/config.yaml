@@ -20,7 +20,7 @@ servos:
   - type: continuous
     servo_channel: 0
   - type: servo
-    servo_channel: 1
+    servo_channel: 2
   - type: servo
     servo_channel: 14
   - type: servo
