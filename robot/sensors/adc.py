@@ -112,7 +112,9 @@ class ADCPoller(object):
         for cb_def in self.callback_defs:
             pin = cb_def.get('apin', -1)
             cb_type = cb_def.get('type', 'knob')
+            logger.info(f"adc {pin} {cb_type} -")
             if 0 <= pin < 8:
+                logger.info(f"adc - 12")
                 if cb_type == 'knob' and self._knob_callback:
                     self._knob_callback(self.pin_as_knob(pin))
                 elif cb_type == 'button' and self._button_callback:

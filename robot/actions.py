@@ -114,7 +114,7 @@ class BasicTest(Action):
 
 class ActionPlayTwoSounds(Action):
     def button_callback(self, button):
-        logger.debug("ActionPlayTwoSounds Button callback:", knob)
+        logger.debug(f"ActionPlayTwoSounds Button callback: {knob}")
 
     def knob_callback(self, knob):
         logger.debug("Knob callback:", knob)

@@ -82,6 +82,7 @@ class RobotDriver:
 
     def register_knob_callback(self, callback):
         self.adc.set_knob_callback(callback)
+
     def deregister_callbacks(self):
         self.adc.clear_callbacks()
 
