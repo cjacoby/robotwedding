@@ -137,6 +137,34 @@ class OLEDDisplay(object):
                     (0, 0), (self.device.width, self.device.height)],
                     fill=f"rgb({int(r)},{int(g)},{int(b)})")
 
+    def draw_bars(self, param1 : float, param2 : float, margin=5):
+        if self.device is None:
+            logger.warning(f"Cannot draw - no OLED")
+            return
+
+        with canvas(self.device) as draw:
+            width = self.device.width
+            height = self.device.height
+
+            rect_bottom = height - margin
+            rect_max = (rect_bottom - margin)
+            rect_left = margin
+            rect_right = width - margin
+
+            halfway = (rect_right - rect_left) // 2
+
+            left_rect_height = rect_max * param1
+            l_rect_top = rect_max - left_rect_height
+            right_rect_height = rect_max * param2
+            r_rect_top = rect_max - right_rect_height
+
+            # left rect
+            draw.rectangle((rect_left, l_rect_top,
+                            halfway, rect_bottom), fill="red")
+            # right rect
+            draw.rectangle((halfway, r_rect_top,
+                            rect_right, rect_bottom), fill="blue")
+
     def move_and_draw_strs(self):
         def init_stars(num_stars, max_depth):
             stars = []

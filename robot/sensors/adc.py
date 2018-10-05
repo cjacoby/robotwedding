@@ -110,6 +110,8 @@ class ADCPoller(object):
                                              self.spi_mosi, self.spi_miso,
                                              self.spi_cs)
 
+        logger.info(f"ADC: {pin_vals}")
+
         for cb_def in self.callback_defs:
             pin = cb_def.get('apin', -1)
             cb_type = cb_def.get('type', 'knob')
