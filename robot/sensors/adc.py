@@ -50,9 +50,10 @@ def read_adc_spi_pin(adc_idx, clockpin, mosipin, misopin, cspin):
 
 
 class ADCKnob(object):
-    def __init__(self, pin_index, value, parent):
+    def __init__(self, pin_index, value, last_value, parent):
         self.pin = pin_index
         self.value = value
+        self.last_value = last_value
         self.parent = parent
 
     def __repr__(self):
@@ -112,11 +113,9 @@ class ADCPoller(object):
         for cb_def in self.callback_defs:
             pin = cb_def.get('apin', -1)
             cb_type = cb_def.get('type', 'knob')
-            logger.info(f"adc {pin} {cb_type} -")
             if 0 <= pin < 8:
-                logger.info(f"adc - 12")
                 if cb_type == 'knob' and self._knob_callback:
-                    self._knob_callback(self.pin_as_knob(pin))
+                    self._knob_callback(self.pin_as_knob(pin, pin_vals[pin]))
                 elif cb_type == 'button' and self._button_callback:
                     self._button_callback(self.pin_as_button(pin))
 
@@ -128,5 +127,5 @@ class ADCPoller(object):
     def pin_as_button(self, pin_index):
         return None
 
-    def pin_as_knob(self, pin_index):
-        return ADCKnob(pin_index, self.last_read[pin_index], self)
+    def pin_as_knob(self, pin_index, new_value):
+        return ADCKnob(pin_index, new_value, self.last_read[pin_index], self)
