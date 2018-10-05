@@ -6,6 +6,9 @@ Each should also be a coroutine.
 import abc
 import asyncio
 import logging
+
+from robot.outputs.display import RESOURCES
+
 logger = logging.getLogger(__name__)
 
 registry = {}
@@ -59,9 +62,10 @@ class MainLoop(Action):
     def knob_callback(self, knob):
         logger.debug(f"Knob callback {knob}")
         if knob.pin == 2:
-            self.bar_one = knob.value / 1024
+            self.bar_one = 1 - (knob.value / 1024)
         elif knob.pin == 3:
-            self.bar_two = knob.value / 1024
+            self.bar_two = 1 - (knob.value / 1024)
+        logger.debug(f"Knob callback {knob}; {self.bar_one} {self.bar_two}")
 
     async def run(self):
         result = None
@@ -73,7 +77,7 @@ class MainLoop(Action):
         await self.driver.sound.aplay_speech(
             "Welcome to Christopher and Zo ell's wedding")
         while total_sleep < self.sleep_time:
-            logger.info(f"Next loop - {total_sleep}, {self.next_state}")
+            logger.debug(f"Next loop - {total_sleep}, {self.next_state}")
             if self.next_state is not None:
                 self.driver.display.draw_text(f"Pushed {self.next_state}")
                 await self.driver.sound.aplay_speech(f"You pushed {self.next_state}")
@@ -85,13 +89,19 @@ class MainLoop(Action):
                 elif self.next_state == "blue":
                     result = ActionPlayTwoSounds
                     break
+                elif self.next_state == "green":
+                    result = WeddingIsLoading
+                    break
+                elif self.next_state == "yellow":
+                    result = DanceParty
+                    break
                 else:
-                    self.driver.display.draw_bars(self.bar_one, self.bar_two)
                     self.driver.clear_all_leds()
                 self.next_state = None
 
-            await asyncio.sleep(1)
-            total_sleep += 1
+            self.driver.display.draw_bars(self.bar_one, self.bar_two)
+            await asyncio.sleep(.1)
+            total_sleep += .1
 
         self.driver.display.clear()
         self.driver.clear_all_leds()
@@ -129,10 +139,12 @@ class ActionPlayTwoSounds(Action):
         logger.debug("Knob callback:", knob)
 
     async def run(self):
+        self.driver.display.draw_image(RESOURCES / "heart1.jpg")
         await self.driver.sound.aplay_init_sound()
         await self.driver.sound.aplay_speech("Hello, I am the robot")
 
         await self.driver.sound.aplay_sin(freq=1000, dur=1)
+        self.driver.display.draw_image(RESOURCES / "heart2.jpg")
 
         await self.driver.sound.aplay_init_sound()
 
@@ -143,3 +155,25 @@ class ActionPrintKnobCallback(Action):
 
     async def run(self):
         await asyncio.sleep(1)
+
+
+class WeddingIsLoading(Action):
+    async def run(self):
+        await self.driver.sound.aplay_init_sound()
+        await self.driver.sound.aplay_speech("Thank you for using our service. Your wedding is generating")
+        self.driver.display.draw_image(RESOURCES / "4_B_wedding-generating-1.png")
+        await asyncio.sleep(1)
+        self.driver.display.draw_image(RESOURCES / "4_B_wedding-generating-2.png")
+        await asyncio.sleep(1)
+        self.driver.display.draw_image(RESOURCES / "4_B_wedding-generating-3.png")
+        await asyncio.sleep(1)
+        self.driver.display.draw_image(RESOURCES / "4_B_wedding-generating-4.png")
+        await asyncio.sleep(1)
+
+
+class DanceParty(Action):
+    async def run(self):
+        await self.driver.sound.aplay_sin(freq=400, dur=.2)
+        await self.driver.sound.aplay_sin(freq=800, dur=.2)
+        await self.driver.sound.aplay_sin(freq=400, dur=.2)
+        await self.driver.sound.aplay_sin(freq=800, dur=.2)

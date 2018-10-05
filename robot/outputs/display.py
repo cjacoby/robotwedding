@@ -211,7 +211,7 @@ class OLEDDisplay(object):
                         shade = (int(100 + (1 - float(star[2]) / max_depth) * 155),) * 3
                     else:
                         shade = "white"
-                    draw.rectangle((x, y, x + size, y + size), fill=shade)
+                        draw.rectangle((x, y, x + size, y + size), fill=shade)
 
 
 def display_factory(config: Mapping) -> List[OLEDDisplay]:

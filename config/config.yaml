@@ -10,7 +10,7 @@ buttons:
   - type: led_push_button
     switch_pin: 23
     led_pin: 22
-    label: blue
+    label: yellow
   - type: led_push_button
     switch_pin: 25
     led_pin: 24
@@ -42,10 +42,6 @@ adc:
   spi_mosi: 20
   spi_cs: 21
   callback_defs:
-    - apin: 0
-      type: knob
-    - apin: 1
-      type: knob
     - apin: 2
       type: knob
     - apin: 3
