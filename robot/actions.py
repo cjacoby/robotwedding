@@ -48,6 +48,9 @@ class MainLoop(Action):
         self.next_state = None
         self.sleep_time = 30
 
+        self.bar_one = 0.4
+        self.bar_two = 0.8
+
     def button_callback(self, button):
         logger.info(f"Button Callback {button}")
         if button is not None and hasattr(button, 'label') and hasattr(button, 'led') and button.led.get_state():
@@ -55,12 +58,17 @@ class MainLoop(Action):
 
     def knob_callback(self, knob):
         logger.debug(f"Knob callback {knob}")
+        if knob.pin == 2:
+            self.bar_one = knob.value / 1024
+        elif knob.pin == 3:
+            self.bar_two = knob.value / 1024
 
     async def run(self):
         result = None
         total_sleep = 0
         logger.info("MainLoop")
         self.driver.display.draw_text("Hello! Main loop.")
+        self.driver.display.draw_bars(self.bar_one, self.bar_two)
         await self.driver.sound.aplay_speech("Hello.")
         await self.driver.sound.aplay_speech(
             "Welcome to Christopher and Zo ell's wedding")
@@ -78,6 +86,7 @@ class MainLoop(Action):
                     result = ActionPlayTwoSounds
                     break
                 else:
+                    self.driver.display.draw_bars(self.bar_one, self.bar_two)
                     self.driver.clear_all_leds()
                 self.next_state = None
 
