@@ -1,0 +1,14 @@
+[Unit]
+Description=Robot Wedding
+
+[Service]
+ExecStart=/home/pi/devel/robotwedding/run.sh
+WorkingDirectory=/home/pi/devel/robotwedding
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+Alias=robotwedding.service
