@@ -5,6 +5,7 @@ Each should also be a coroutine.
 """
 import abc
 import asyncio
+import collections
 import logging
 
 from robot.outputs.display import RESOURCES
@@ -12,9 +13,12 @@ from robot.outputs.display import RESOURCES
 logger = logging.getLogger(__name__)
 
 registry = {}
+tagged_registry = collections.defaultdict(list)
 
 
 class Action(abc.ABC):
+    tags = []
+
     def __init__(self, driver):
         self.driver = driver
 
@@ -24,6 +28,9 @@ class Action(abc.ABC):
         super().__init_subclass__(**kwargs)
 
         registry[cls.__name__] = cls
+
+        for tag in cls.tags:
+            tagged_registry[tag].append(cls)
 
     def __enter__(self):
         "register the subclass's callbacks, if available, to the driver"
@@ -109,6 +116,8 @@ class MainLoop(Action):
 
 
 class FlashStuff(Action):
+    tags = ['random']
+
     async def run(self):
         logger.info("FlashStuff")
         self.driver.display.draw_text("beep beep!")
@@ -172,6 +181,8 @@ class WeddingIsLoading(Action):
 
 
 class DanceParty(Action):
+    tags = ['random']
+
     async def run(self):
         await self.driver.sound.aplay_sin(freq=400, dur=.2)
         await self.driver.sound.aplay_sin(freq=800, dur=.2)

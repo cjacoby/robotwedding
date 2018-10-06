@@ -165,12 +165,8 @@ class RobotScriptRunner(object):
 
         while True:
             if len(action_queue) == 0:
-                if random.random() < .4:
-                    logger.info("Going to main loop")
-                    action_queue.append(self._get_main_loop())
-                else:
-                    logger.info("Choosing random action")
-                    action_queue.append(self._get_random_action())
+                logger.info("Going to main loop")
+                action_queue.append(self._get_main_loop())
 
             action = action_queue.pop(0)(self.driver)
             logger.info(f"Action chosen: {action}")
