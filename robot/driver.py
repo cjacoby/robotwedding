@@ -111,17 +111,18 @@ class RobotDriver:
     def trigger_button_cb(self, index: int) -> None:
         logger.info(f"Trigger button {index} callback.")
 
-    def set_servo_position(self, index: int, position: float) -> None:
-        logger.info(f"Set Servo {index}: {position}")
-        if 0 <= index < len(self.servos):
-            self.servos[index].set_position_norm(position)
+    def set_servo_position(self, label: str, position: float) -> None:
+        logger.info(f"Set Servo {label}: {position}")
+        servo = self.servos.get(label)
+        if servo:
+            servo.set_position_norm(position)
 
-    def set_servo_stepped(self, index: int, position: float,
+    def set_servo_stepped(self, label: str, position: float,
                           duration: float, steps: int) -> None:
-        logger.info(f"Set Servo {index}: {position} over {duration}s")
-        if 0 <= index < len(self.servos):
-            self.servos[index].set_position_stepped(
-                position, duration, steps)
+        logger.info(f"Set Servo {label}: {position} over {duration}s")
+        servo = self.servos.get(label)
+        if servo:
+            servo.set_position_stepped(position, duration, steps)
 
     def read_adc(self) -> np.ndarray:
         return self.adc.poll()
@@ -142,7 +143,7 @@ class RobotDriver:
     def setup(self) -> None:
         for b in self.buttons:
             b.setup()
-        for s in self.servos:
+        for s in self.servos.values():
             s.setup()
         self.adc.setup()
         for d in self.displays:

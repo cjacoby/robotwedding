@@ -19,17 +19,17 @@ buttons:
 servos:
   - type: continuous
     servo_channel: 0
+    label: right_arm
   - type: servo
-    servo_channel: 2
+    servo_channel: 4
+    label: head
   - type: servo
     servo_channel: 14
+    label: left_shoulder
   - type: servo
     servo_channel: 15
     servo_range: [125, 625]
-  - type: servo
-    servo_channel: 8
-  - type: servo
-    servo_channel: 9
+    label: left_arm
 
 display:
   - type: oled

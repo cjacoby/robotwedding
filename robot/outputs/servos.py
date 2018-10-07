@@ -153,9 +153,11 @@ class ServoType(str, enum.Enum):
 
 
 def servo_factory(servo_defs: list):
-    servos = []
+    servos = {}
+
     for s in servo_defs:
         servo_type = s.pop('type')
-        servos.append(ServoType(servo_type).servo_cls(**s))
+        servo_label = s.pop('label')
+        servos[servo_label] = ServoType(servo_type).servo_cls(**s)
 
     return servos

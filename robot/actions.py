@@ -7,6 +7,7 @@ import abc
 import asyncio
 import collections
 import logging
+import random
 
 from robot.outputs.display import RESOURCES
 
@@ -51,6 +52,8 @@ class Action(abc.ABC):
         self.driver.deregister_callbacks()
         return False
 
+bar_one = 0.4
+bar_two = 0.8
 
 class MainLoop(Action):
     def __init__(self, driver, sleep_time=15):
@@ -61,6 +64,8 @@ class MainLoop(Action):
         self.bar_one = 0.4
         self.bar_two = 0.8
 
+        self.servo_pos = collections.defaultdict(float)
+
     def button_callback(self, button):
         logger.info(f"Button Callback {button}")
         if button is not None and hasattr(button, 'label') and hasattr(button, 'led') and button.led.get_state():
@@ -68,21 +73,77 @@ class MainLoop(Action):
 
     def knob_callback(self, knob):
         logger.debug(f"Knob callback {knob}")
+        global bar_one
+        global bar_two
         if knob.pin == 2:
             self.bar_one = 1 - (knob.value / 1024)
+            bar_one = self.bar_one
         elif knob.pin == 3:
             self.bar_two = 1 - (knob.value / 1024)
+            bar_two = self.bar_two
+
+        self.driver.display.draw_bars(bar_one, bar_two)
         logger.debug(f"Knob callback {knob}; {self.bar_one} {self.bar_two}")
+
+    async def run_servo_script(self, script):
+        for label, pos, diff, pause in script:
+            if label:
+                if diff:
+                    pos = self.servo_pos[label] + diff
+                    if pos >= 1.0:
+                        pos = 1.0
+                    if label == 'right_arm':
+                        if pos <= -0.4:
+                            pos = -0.4
+                        if pos >= 0.4:
+                            pos = 0.4
+                        if -0.03 < pos < 0.03:
+                            pos = 0.0
+                    else:
+                        if pos <= 0.0:
+                            pos = 0.0
+                self.driver.set_servo_position(label, pos)
+                self.servo_pos[label] = pos
+            if pause:
+                await asyncio.sleep(pause)
 
     async def run(self):
         result = None
         total_sleep = 0
         logger.info("MainLoop")
-        self.driver.display.draw_text("Hello! Main loop.")
-        self.driver.display.draw_bars(self.bar_one, self.bar_two)
-        await self.driver.sound.aplay_speech("Hello.")
-        await self.driver.sound.aplay_speech(
-            "Welcome to Christopher and Zo ell's wedding")
+
+        self.driver.set_servo_position('head', .5)
+
+        tasks = []
+
+        tasks.append(self.run_servo_script([
+            # Init
+            ('left_shoulder', .2, None, 0),
+            ('left_arm', .3, None, 0),
+            ('right_arm', 0, None, 0),
+            (None, None, None, .1),
+
+            # Do the stuff
+            ('right_arm', .2, None, 0),
+            ('left_shoulder', .1, None, .1),
+            ('left_arm', .6, None, .2),
+            (None, None, None, 1),
+
+            # Go back to initial
+            ('left_shoulder', .2, None, 0),
+            ('left_arm', .3, None, 0),
+            ('right_arm', 0, None, 0),
+            (None, None, None, .1),
+        ]))
+
+        #self.driver.display.draw_bars(self.bar_one, self.bar_two)
+
+        async def welcome():
+            await self.driver.sound.aplay_speech("Hello.")
+            await self.driver.sound.aplay_speech(
+                "Welcome to Christopher and Zo ell's wedding")
+        tasks.append(welcome())
+
         while total_sleep < self.sleep_time:
             logger.debug(f"Next loop - {total_sleep}, {self.next_state}")
             if self.next_state is not None:
@@ -106,8 +167,18 @@ class MainLoop(Action):
                     self.driver.clear_all_leds()
                 self.next_state = None
 
-            self.driver.display.draw_bars(self.bar_one, self.bar_two)
-            await asyncio.sleep(.1)
+            if random.random() > .6:
+                tasks.append(self.run_servo_script([
+                    # Do the stuff
+                    ('left_shoulder', None, random.uniform(-self.bar_two, self.bar_two) / 20.0, 0),
+                    ('left_arm', None, random.uniform(-self.bar_two, self.bar_two) / 20.0, 0),
+                    ('right_arm', None, random.uniform(-self.bar_one, self.bar_one) / 10.0, 0),
+                ]))
+
+            tasks.append(asyncio.sleep(.1))
+            await asyncio.gather(*tasks)
+
+            tasks = []
             total_sleep += .1
 
         self.driver.display.clear()
